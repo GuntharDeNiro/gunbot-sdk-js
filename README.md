@@ -1,3 +1,5 @@
+<p align="center"> <img src="https://raw.githubusercontent.com/gunthardeniro/gunbot-sdk-js/main/assets/logo.svg" width="96" alt="Gunbot SDK logo"></p>
+
 # Gunbot SDK for JavaScript & TypeScript
 **JavaScript & TypeScript client for the Gunbot REST API for automated crypto-/ETF-/stock trading**
  
@@ -6,7 +8,6 @@
 
 > Programmatically control **Gunbot** – the self-hosted automated trading bot – from Node.js, browsers, CI jobs or serverless functions. 
 
-<p align="center"> <img src="https://raw.githubusercontent.com/gunthardeniro/gunbot-sdk-js/main/assets/logo.svg" width="96" alt="Gunbot SDK logo"></p>
 
 **Key Features**
 - **100 % OpenAPI 3.0 generated** – strong typings & up-to-date endpoints  
@@ -72,7 +73,7 @@ console.log(assets);
 
 > Replace `<host>` and `<token>` with your own instance values. 
 
-> The docs folder on Github has documentation for each of the supported methods.
+> The docs folder on Github has documentation for each of the supported methods, [online version of this documentation](https://gunthardeniro.github.io/gunbot-sdk-js/).
 
 > You need an appropriate [Gunbot plan](https://www.gunbot.com) to use this SDK effectively.
 
