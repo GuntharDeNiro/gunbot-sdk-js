@@ -4,7 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/gunbot-sdk-js.svg)](https://www.npmjs.com/package/gunbot-sdk-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-> Programmatically control **Gunbot** – the self-hosted automated trading bot – from Node.js, browsers, CI jobs or serverless functions.
+> Programmatically control **Gunbot** – the self-hosted automated trading bot – from Node.js, browsers, CI jobs or serverless functions. 
 
 <p align="center"> <img src="https://raw.githubusercontent.com/gunthardeniro/gunbot-sdk-js/main/assets/logo.svg" width="96" alt="Gunbot SDK logo"></p>
 
@@ -71,7 +71,10 @@ console.log(assets);
 ```
 
 > Replace `<host>` and `<token>` with your own instance values. 
-> The docs folder has [documentation for each of the supported methods](https://github.com/GuntharDeNiro/gunbot-sdk-js/tree/main/docs/index.html).
+
+> The docs folder on Github has documentation for each of the supported methods.
+
+> You need an appropriate [Gunbot plan](https://www.gunbot.com) to use this SDK effectively.
 
 
 ---
