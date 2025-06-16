@@ -1,5 +1,7 @@
 # Gunbot SDK for JavaScript & TypeScript
 **JavaScript & TypeScript client for the Gunbot REST API for automated crypto-/ETF-/stock trading**
+
+<p align="center"> <img src="https://raw.githubusercontent.com/gunthardeniro/gunbot-sdk-js/main/assets/logo.svg" width="96" alt="Gunbot SDK logo"></p>
  
 [![npm version](https://img.shields.io/npm/v/gunbot-sdk-js.svg)](https://www.npmjs.com/package/gunbot-sdk-js)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/gunbot-sdk-js)](https://bundlephobia.com/package/gunbot-sdk-js)
