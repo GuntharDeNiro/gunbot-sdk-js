@@ -88,7 +88,7 @@ console.log(assets);
 
 ## Supported Exchanges
 
-> Gunbot ships with native connectors for **25+ venues**. 
+> Gunbot ships with native connectors for **25+ exchanges**. 
 
 | Exchange | Spot | Futures / Perps | DeFi (on-chain) | Extra notes |
 | --- | :---: | :---: | :---: | --- |
