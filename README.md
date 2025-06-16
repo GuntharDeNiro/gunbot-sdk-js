@@ -3,7 +3,7 @@
  
 [![npm version](https://img.shields.io/npm/v/gunbot-sdk-js.svg)](https://www.npmjs.com/package/gunbot-sdk-js)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/gunbot-sdk-js)](https://bundlephobia.com/package/gunbot-sdk-js)
-[![license](https://img.shields.io/npm/l/gunbot-sdk-js.svg)](LICENSE)
+[![license](https://img.shields.io/npm/l/gunbot-sdk-js.svg)](MIT)
 
 > Programmatically control **Gunbot** – the self-hosted automated trading bot – from Node.js, browsers, CI jobs or serverless functions.
 
