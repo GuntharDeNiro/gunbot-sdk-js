@@ -1,21 +1,30 @@
 {
   "name": "gunbot-sdk-js",
   "version": "0.1.0",
-  "description": "JavaScript/TypeScript SDK for the Gunbot crypto-trading REST API. Query balances, orders and historical PnL with one import.",
+  "description": "Open-source JavaScript & TypeScript **SDK** for controlling the Gunbot trading bot REST API (crypto, ETF, stock)",
   "keywords": [
     "gunbot",
+    "sdk",
+    "api",
+    "client",
+    "nodejs",
+    "bot",
+    "crypto",
+    "stocks",
+    "etf",
+    "trading",
     "crypto-trading",
-    "rest-api",
+    "trading-bot",
     "javascript-sdk",
     "typescript",
-    "binance",
-    "coinbase",
-    "bot"
+    "trading-bot",
+    "automated-trading",
+    "exchange"
   ],
   "homepage": "https://www.gunbot.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gunthardeniro/gunbot-sdk-js.git"
+    "url": "git+https://github.com/gunthardeniro/gunbot-sdk-js.git"
   },
   "bugs": {
     "url": "https://github.com/gunthardeniro/gunbot-sdk-js/issues"
@@ -80,7 +89,6 @@
   "files": [
     "dist/",
     "LICENSE",
-    "CHANGELOG.md",
     "README.md"
   ],
   "publishConfig": {
