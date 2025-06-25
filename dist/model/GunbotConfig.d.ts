@@ -12,8 +12,4 @@ export default class GunbotConfig {
      * @return {module:model/GunbotConfig} The populated <code>GunbotConfig</code> instance.
      */
     static constructFromObject(data: any, obj: any): any;
-    /**
-     * @member {Object.<String, Object.<String, Object>>} pairs
-     */
-    pairs: any;
 }

@@ -1,6 +1,6 @@
 {
   "name": "gunbot-sdk-js",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Open-source JavaScript & TypeScript **SDK** for controlling the Gunbot trading bot REST API (crypto, ETF, stock)",
   "keywords": [
     "gunbot",

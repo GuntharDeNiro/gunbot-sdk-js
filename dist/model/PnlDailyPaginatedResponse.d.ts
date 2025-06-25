@@ -13,11 +13,13 @@ export default class PnlDailyPaginatedResponse {
      */
     static constructFromObject(data: any, obj: any): any;
     /**
-     * @member {Number} totalSize
+     * Constructs a new <code>PnlDailyPaginatedResponse</code>.
+     * @alias module:model/PnlDailyPaginatedResponse
+     * @class
+     * @param totalSize {Number}
+     * @param data {Array.<Array.<Object>>}
      */
-    totalSize: any;
-    /**
-     * @member {Array.<Object.<String, Object>>} data
-     */
-    data: any;
+    constructor(totalSize: number, data: Array<Array<any>>);
+    totalSize: number;
+    data: any[][];
 }

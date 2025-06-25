@@ -82,7 +82,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: authLogin — Login User
+      summary: authLogin — authLogin — Login User
       description: Authenticate a user and obtain a JSON Web Token (JWT).
       requestBody:
         required: true
@@ -106,7 +106,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: authStatus — Get Authentication Status
+      summary: authStatus — authStatus — Get Authentication Status
       description: Validate the current session's authentication status using the provided token.
       security:
         - BearerAuth: []
@@ -124,7 +124,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: balances — Get Asset Balances
+      summary: balances — balances — Get Asset Balances
       description: Retrieve asset balances across exchanges for the authenticated user.
       security:
         - BearerAuth: []
@@ -142,7 +142,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: assetsTotal — Get Historical Total Asset Value
+      summary: assetsTotal — assetsTotal — Get Historical Total Asset Value
       description: Retrieve historical total asset value in a base currency over a time range.
       security:
         - BearerAuth: []
@@ -168,7 +168,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pairs — Get Trading Pairs
+      summary: pairs — pairs — Get Trading Pairs
       description: Retrieve a list of trading pairs for a specified exchange. The `exchange` parameter should be URL-encoded if it contains special characters (e.g., `#` as `%23`).
       security:
         - BearerAuth: []
@@ -196,7 +196,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pairsDetailed — Get Detailed Trading Pairs
+      summary: pairsDetailed — pairsDetailed — Get Detailed Trading Pairs
       description: Retrieve detailed trading pair information for a specified exchange. The `exchange` parameter should be URL-encoded if it contains special characters.
       security:
         - BearerAuth: []
@@ -224,7 +224,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: configFull — Get Full Configuration
+      summary: configFull — configFull — Get Full Configuration
       description: Retrieve the entire application configuration.
       security:
         - BearerAuth: []
@@ -242,7 +242,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: configUpdate — Update Full Configuration
+      summary: configUpdate — configUpdate — Update Full Configuration
       description: Update the entire configuration with a new object.
       security:
         - BearerAuth: []
@@ -268,7 +268,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: configPairAdd — Add Trading Pair to Configuration
+      summary: configPairAdd — configPairAdd — Add Trading Pair to Configuration
       description: Add a new trading pair to the configuration.
       security:
         - BearerAuth: []
@@ -294,7 +294,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: configPairRemove — Remove Trading Pair from Configuration
+      summary: configPairRemove — configPairRemove — Remove Trading Pair from Configuration
       description: Remove a trading pair from the configuration.
       security:
         - BearerAuth: []
@@ -320,7 +320,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: configStrategyAdd — Add Trading Strategy to Configuration
+      summary: configStrategyAdd — configStrategyAdd — Add Trading Strategy to Configuration
       description: Add a new trading strategy to the configuration.
       security:
         - BearerAuth: []
@@ -346,7 +346,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: configStrategyRemove — Remove Trading Strategy from Configuration
+      summary: configStrategyRemove — configStrategyRemove — Remove Trading Strategy from Configuration
       description: Remove a trading strategy from the configuration.
       security:
         - BearerAuth: []
@@ -372,7 +372,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: filesAcvar — List AutoConfig Variable Files
+      summary: filesAcvar — filesAcvar — List AutoConfig Variable Files
       description: List filenames of available AutoConfig variable files.
       security:
         - BearerAuth: []
@@ -390,12 +390,12 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesAcvarGet — Get AutoConfig Variable File Content
+      summary: filesAcvarGet — filesAcvarGet — Get AutoConfig Variable File Content
       description: Retrieve the content of a specified AutoConfig variable file.
       security:
         - BearerAuth: []
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -416,7 +416,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesAutoconfigWrite — Write to autoconfig.json File
+      summary: filesAutoconfigWrite — filesAutoconfigWrite — Write to autoconfig.json File
       description: Write content to the `autoconfig.json` file.
       security:
         - BearerAuth: []
@@ -442,7 +442,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesBackup — List Backup Files
+      summary: filesBackup — filesBackup — List Backup Files
       description: List available backup files.
       security:
         - BearerAuth: []
@@ -460,7 +460,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesBackupGet — Get Backup File Content
+      summary: filesBackupGet — filesBackupGet — Get Backup File Content
       description: Retrieve the content of a specified backup config file.
       security:
         - BearerAuth: []
@@ -486,7 +486,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesCustomEditorGet — Get Custom Strategy Editor File Content
+      summary: filesCustomEditorGet — filesCustomEditorGet — Get Custom Strategy Editor File Content
       description: Retrieve the content of the custom strategy editor file.
       security:
         - BearerAuth: []
@@ -494,11 +494,9 @@ paths:
         '200':
           description: Custom strategy editor file content retrieved
           content:
-            application/json:
+            text/plain:
               schema:
-                type: object
-                additionalProperties: true
-                example: {}
+                type: string
         '401':
           $ref: '#/components/responses/Unauthorized'
       operationId: filesCustomEditorGet
@@ -506,7 +504,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesCustomEditorWrite — Write to Custom Strategy Editor File
+      summary: filesCustomEditorWrite — filesCustomEditorWrite — Write to Custom Strategy Editor File
       description: Write content to the custom strategy editor file.
       security:
         - BearerAuth: []
@@ -532,7 +530,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: filesState — List State Files
+      summary: filesState — filesState — List State Files
       description: List filenames of available state files.
       security:
         - BearerAuth: []
@@ -550,7 +548,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesStateGet — Get State File Content
+      summary: filesStateGet — filesStateGet — Get State File Content
       description: Retrieve the content of a specific state file.
       security:
         - BearerAuth: []
@@ -576,7 +574,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: filesStrategy — List Custom Strategy Files
+      summary: filesStrategy — filesStrategy — List Custom Strategy Files
       description: List filenames of available custom strategy files (JavaScript files).
       security:
         - BearerAuth: []
@@ -594,7 +592,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesStrategyGet — Get Custom Strategy File Content
+      summary: filesStrategyGet — filesStrategyGet — Get Custom Strategy File Content
       description: Retrieve the content of a specific custom strategy file. The response is the raw content of the file, likely JavaScript code, wrapped in a JSON object.
       security:
         - BearerAuth: []
@@ -608,11 +606,9 @@ paths:
         '200':
           description: Custom strategy file content retrieved. Example shows an empty object, actual content would be the file's text if it were wrapped.
           content:
-            application/json:
+            text/plain:
               schema:
-                type: object
-                additionalProperties: true
-                example: {}
+                type: string
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -622,7 +618,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesStrategyWrite — Write to Custom Strategy File
+      summary: filesStrategyWrite — filesStrategyWrite — Write to Custom Strategy File
       description: Write JavaScript code content to a specific custom strategy file.
       security:
         - BearerAuth: []
@@ -648,7 +644,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: filesStrategyDelete — Delete Custom Strategy File
+      summary: filesStrategyDelete — filesStrategyDelete — Delete Custom Strategy File
       description: Delete a specific custom strategy file.
       security:
         - BearerAuth: []
@@ -674,7 +670,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: marketCandles — Get Market Candles (OHLCV)
+      summary: marketCandles — marketCandles — Get Market Candles (OHLCV)
       description: Retrieve historical OHLCV candle data for a trading pair. The `key` parameter (exchange/pair) must be URL-encoded.
       security:
         - BearerAuth: []
@@ -702,7 +698,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: marketOrderbook — Get Market Orderbook
+      summary: marketOrderbook — marketOrderbook — Get Market Orderbook
       description: Retrieve current order book (bids and asks) for a trading pair. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -730,7 +726,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: corememRequest — Get Raw Core Memory Data for a Pair
+      summary: corememRequest — corememRequest — Get Raw Core Memory Data for a Pair
       description: Retrieve raw core memory data for a specific trading pair, optionally filtered by elements.
       security:
         - BearerAuth: []
@@ -756,7 +752,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: coremem — Get Core Memory Snapshot (All Pairs)
+      summary: coremem — coremem — Get Core Memory Snapshot (All Pairs)
       description: Retrieve a snapshot of relevant core memory data for all active trading pairs. Data is slightly delayed and transformed for frontend use.
       security:
         - BearerAuth: []
@@ -774,7 +770,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: corememSingle — Get Core Memory Snapshot (Single Pair)
+      summary: corememSingle — corememSingle — Get Core Memory Snapshot (Single Pair)
       description: Retrieve a snapshot of relevant core memory data for a single active trading pair. Data is slightly delayed and transformed.
       security:
         - BearerAuth: []
@@ -800,7 +796,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: chartData — Get Chart Data (Candles and Indicators)
+      summary: chartData — chartData — Get Chart Data (Candles and Indicators)
       description: Retrieve chart data, including candles and indicators, for a specific trading pair.
       security:
         - BearerAuth: []
@@ -826,7 +822,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: chartMarks — Get Chart Timescale Marks
+      summary: chartMarks — chartMarks — Get Chart Timescale Marks
       description: Retrieve chart timescale marks (annotations like buy/sell triggers) for a pair and interval.
       security:
         - BearerAuth: []
@@ -880,7 +876,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: pnlOverview — Get PNL Overview
+      summary: pnlOverview — pnlOverview — Get PNL Overview
       description: Retrieve an overview of PNL data, summarized over time periods and trading pairs.
       security:
         - BearerAuth: []
@@ -906,7 +902,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pnlDaily — Get Daily PNL for a Trading Key
+      summary: pnlDaily — pnlDaily — Get Daily PNL for a Trading Key
       description: Retrieve daily PNL data for a specific trading key within a time range. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -950,7 +946,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pnlDailyPaginated — Get Paginated Daily PNL for a Trading Key
+      summary: pnlDailyPaginated — pnlDailyPaginated — Get Paginated Daily PNL for a Trading Key
       description: Retrieve paginated daily PNL data for a specific trading key. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -1000,7 +996,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pnlSum — Get PNL Sum for an Exchange Key
+      summary: pnlSum — pnlSum — Get PNL Sum for an Exchange Key
       description: Retrieve total PNL sum and investment for an exchange key over a time range. The `exchange` parameter (exchange key) must be URL-encoded.
       security:
         - BearerAuth: []
@@ -1044,7 +1040,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: pnlTotal — Get Total PNL for a Trading Key
+      summary: pnlTotal — pnlTotal — Get Total PNL for a Trading Key
       description: Retrieve total PNL for a specific trading key. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -1072,7 +1068,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: systemStart — Start System
+      summary: systemStart — systemStart — Start System
       description: Start the Gunbot system. Returns current configuration without private keys.
       security:
         - BearerAuth: []
@@ -1092,7 +1088,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: systemStop — Stop System
+      summary: systemStop — systemStop — Stop System
       description: Stop the Gunbot system. Returns current configuration without private keys.
       security:
         - BearerAuth: []
@@ -1112,7 +1108,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: time — Get Server Time
+      summary: time — time — Get Server Time
       description: Retrieve the current server time in milliseconds since Unix epoch.
       security:
         - BearerAuth: []
@@ -1130,7 +1126,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: licenseKeysEdit — Edit License Keys
+      summary: licenseKeysEdit — licenseKeysEdit — Edit License Keys
       description: Edit license keys for a wallet, optionally verifying with an exchange.
       security:
         - BearerAuth: []
@@ -1158,7 +1154,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeBuy — Place Limit Buy Order
+      summary: tradeBuy — tradeBuy — Place Limit Buy Order
       description: Place a limit buy order.
       security:
         - BearerAuth: []
@@ -1188,7 +1184,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeBuyMarket — Place Market Buy Order
+      summary: tradeBuyMarket — tradeBuyMarket — Place Market Buy Order
       description: Place a market buy order.
       security:
         - BearerAuth: []
@@ -1217,7 +1213,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeSell — Place Limit Sell Order
+      summary: tradeSell — tradeSell — Place Limit Sell Order
       description: Place a limit sell order.
       security:
         - BearerAuth: []
@@ -1247,7 +1243,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeSellMarket — Place Market Sell Order
+      summary: tradeSellMarket — tradeSellMarket — Place Market Sell Order
       description: Place a market sell order.
       security:
         - BearerAuth: []
@@ -1276,7 +1272,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeCancel — Cancel Order
+      summary: tradeCancel — tradeCancel — Cancel Order
       description: Cancel an existing order.
       security:
         - BearerAuth: []
@@ -1307,7 +1303,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: orders — Get Order History for a Pair
+      summary: orders — orders — Get Order History for a Pair
       description: Retrieve locally stored order history for a trading pair. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -1335,7 +1331,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: ordersDay — Get Orders for Current Day (Multiple Pairs)
+      summary: ordersDay — ordersDay — Get Orders for Current Day (Multiple Pairs)
       description: Retrieve orders from the current day for multiple trading pairs. Individual keys in `keys[]` array must be URL-encoded if they contain special characters.
       security:
         - BearerAuth: []
@@ -1376,7 +1372,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: ordersPage — Get Paginated Orders for a Pair
+      summary: ordersPage — ordersPage — Get Paginated Orders for a Pair
       description: Retrieve paginated orders for a trading pair. The `key` parameter must be URL-encoded.
       security:
         - BearerAuth: []
@@ -1420,7 +1416,7 @@ paths:
     get:
       tags:
         - Gunbot
-      summary: ordersPageMulti — Get Paginated Orders (Multiple Pairs)
+      summary: ordersPageMulti — ordersPageMulti — Get Paginated Orders (Multiple Pairs)
       description: Retrieve paginated orders for multiple trading pairs. Individual keys in `keys[]` array must be URL-encoded if needed.
       security:
         - BearerAuth: []
@@ -1470,7 +1466,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeBuyStoplimit — Place Stop-Limit Buy Order (Binance)
+      summary: tradeBuyStoplimit — tradeBuyStoplimit — Place Stop-Limit Buy Order (Binance)
       description: Place a stop-limit buy order on Binance.
       security:
         - BearerAuth: []
@@ -1501,7 +1497,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeSellStoplimit — Place Stop-Limit Sell Order (Binance)
+      summary: tradeSellStoplimit — tradeSellStoplimit — Place Stop-Limit Sell Order (Binance)
       description: Place a stop-limit sell order on Binance.
       security:
         - BearerAuth: []
@@ -1532,7 +1528,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeBuyTrailingstop — Place Trailing Stop Buy Order (Binance)
+      summary: tradeBuyTrailingstop — tradeBuyTrailingstop — Place Trailing Stop Buy Order (Binance)
       description: Place a trailing stop buy order on Binance. `price` is the reference price.
       security:
         - BearerAuth: []
@@ -1563,7 +1559,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeSellTrailingstop — Place Trailing Stop Sell Order (Binance)
+      summary: tradeSellTrailingstop — tradeSellTrailingstop — Place Trailing Stop Sell Order (Binance)
       description: Place a trailing stop sell order on Binance. `price` is the reference price.
       security:
         - BearerAuth: []
@@ -1594,7 +1590,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeBuyOco — Place OCO Buy Order (Binance)
+      summary: tradeBuyOco — tradeBuyOco — Place OCO Buy Order (Binance)
       description: Place an OCO (One-Cancels-the-Other) buy order on Binance.
       security:
         - BearerAuth: []
@@ -1626,7 +1622,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeSellOco — Place OCO Sell Order (Binance)
+      summary: tradeSellOco — tradeSellOco — Place OCO Sell Order (Binance)
       description: Place an OCO (One-Cancels-the-Other) sell order on Binance.
       security:
         - BearerAuth: []
@@ -1658,7 +1654,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeClose — Close Position with Limit Price (Bybit Futures)
+      summary: tradeClose — tradeClose — Close Position with Limit Price (Bybit Futures)
       description: Close an open position at a specified limit price on Bybit (futures).
       security:
         - BearerAuth: []
@@ -1688,7 +1684,7 @@ paths:
     post:
       tags:
         - Gunbot
-      summary: tradeCloseMarket — Close Position at Market Price (Bybit Futures)
+      summary: tradeCloseMarket — tradeCloseMarket — Close Position at Market Price (Bybit Futures)
       description: Close an open position at the current market price on Bybit (futures).
       security:
         - BearerAuth: []
@@ -1927,6 +1923,7 @@ components:
                   type: boolean
                 override:
                   type: object
+      additionalProperties: true
       example:
         pairs:
           binance:
@@ -1948,7 +1945,7 @@ components:
       required:
         - data
       properties:
-        data:
+        config:
           $ref: '#/components/schemas/GunbotConfig'
           description: The new configuration object to apply.
     ConfigUpdateResponse:
@@ -1997,6 +1994,7 @@ components:
       type: object
       required:
         - name
+        - settings
       properties:
         name:
           type: string
@@ -2304,12 +2302,14 @@ components:
       properties:
         totalSize:
           type: integer
-          example: 0
         data:
           type: array
           items:
-            type: object
-            additionalProperties: true
+            type: array
+            items: {}
+      required:
+        - totalSize
+        - data
     PnlSumResponse:
       type: object
       properties:
@@ -2329,7 +2329,7 @@ components:
             additionalProperties: true
     PnlTotalResponse:
       type: object
-      additionalProperties: false
+      additionalProperties: true
     SystemActionResponse:
       $ref: '#/components/schemas/GunbotConfig'
     TimeResponse:
@@ -2542,23 +2542,28 @@ components:
       properties:
         days:
           type: array
+          description: ISO-8601 dates.
           items:
-            type: object
-            additionalProperties: true
+            type: string
         orders:
           type: array
+          description: Order count per day.
           items:
-            type: object
-            additionalProperties: true
+            type: integer
         closeOrders:
           type: array
+          description: Close order count per day.
           items:
-            type: object
-            additionalProperties: true
+            type: integer
       example:
-        days: []
-        orders: []
-        closeOrders: []
+        days:
+          - '2025-06-20'
+        orders:
+          - 123456
+          - 123457
+        closeOrders:
+          - 123450
+          - 123451
     OrdersPageResponse:
       type: object
       properties:

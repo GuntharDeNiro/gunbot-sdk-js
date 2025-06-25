@@ -13,15 +13,18 @@ export default class OrdersDayResponse {
      */
     static constructFromObject(data: any, obj: any): any;
     /**
-     * @member {Array.<Object.<String, Object>>} days
+     * ISO-8601 dates.
+     * @member {Array.<String>} days
      */
     days: any;
     /**
-     * @member {Array.<Object.<String, Object>>} orders
+     * Order count per day.
+     * @member {Array.<Number>} orders
      */
     orders: any;
     /**
-     * @member {Array.<Object.<String, Object>>} closeOrders
+     * Close order count per day.
+     * @member {Array.<Number>} closeOrders
      */
     closeOrders: any;
 }

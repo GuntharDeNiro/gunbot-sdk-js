@@ -17587,18 +17587,35 @@ var ApiClient = class _ApiClient {
     }
     if (typeof callback === "function") {
       request.end((error, response) => {
-        callback(error, response);
+        let data = null;
+        if (!error) {
+          try {
+            data = this.deserialize(response, returnType);
+            if (this.enableCookies && typeof window === "undefined") {
+              this.agent.saveCookies(response);
+            }
+          } catch (err) {
+            error = err;
+          }
+        }
+        callback(error, data, response);
       });
       return request;
     }
     return new Promise((resolve, reject) => {
       request.end((error, response) => {
-        if (error) return reject(error);
+        if (error) {
+          reject(error);
+          return;
+        }
         try {
           const data = this.deserialize(response, returnType);
+          if (this.enableCookies && typeof window === "undefined") {
+            this.agent.saveCookies(response);
+          }
           resolve(data);
-        } catch (e) {
-          reject(e);
+        } catch (err) {
+          reject(err);
         }
       });
     });
@@ -18042,9 +18059,9 @@ var ChartMarksResponse = class _ChartMarksResponse extends Array {
 var GunbotConfig = class _GunbotConfig {
   /**
    * Constructs a new <code>GunbotConfig</code>.
-   * Represents the Gunbot configuration structure. This is a simplified placeholder; the actual config is deeply nested.
    * @alias module:model/GunbotConfig
    * @class
+   * @extends Object
    */
   constructor() {
   }
@@ -18058,13 +18075,11 @@ var GunbotConfig = class _GunbotConfig {
   static constructFromObject(data, obj) {
     if (data) {
       obj = obj || new _GunbotConfig();
-      if (data.hasOwnProperty("pairs"))
-        obj.pairs = ApiClient.convertToType(data["pairs"], { "String": { "String": Object } });
+      ApiClient.constructFromObject(data, obj, "Object");
     }
     return obj;
   }
 };
-GunbotConfig.prototype.pairs = void 0;
 
 // src/model/ConfigFullResponse.js
 var ConfigFullResponse = class _ConfigFullResponse {
@@ -18174,9 +18189,11 @@ var ConfigStrategyAddRequest = class _ConfigStrategyAddRequest {
    * @alias module:model/ConfigStrategyAddRequest
    * @class
    * @param name {String} The name of the strategy to add (e.g., `myStrategy`).
+   * @param settings {Object.<String, Object>} (Optional) Specific settings for the strategy.
    */
-  constructor(name) {
+  constructor(name, settings) {
     this.name = name;
+    this.settings = settings;
   }
   /**
    * Constructs a <code>ConfigStrategyAddRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -18234,10 +18251,8 @@ var ConfigUpdateRequest = class _ConfigUpdateRequest {
    * Constructs a new <code>ConfigUpdateRequest</code>.
    * @alias module:model/ConfigUpdateRequest
    * @class
-   * @param data {module:model/GunbotConfig} 
    */
-  constructor(data) {
-    this.data = data;
+  constructor() {
   }
   /**
    * Constructs a <code>ConfigUpdateRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -18249,13 +18264,13 @@ var ConfigUpdateRequest = class _ConfigUpdateRequest {
   static constructFromObject(data, obj) {
     if (data) {
       obj = obj || new _ConfigUpdateRequest();
-      if (data.hasOwnProperty("data"))
-        obj.data = GunbotConfig.constructFromObject(data["data"]);
+      if (data.hasOwnProperty("config"))
+        obj.config = GunbotConfig.constructFromObject(data["config"]);
     }
     return obj;
   }
 };
-ConfigUpdateRequest.prototype.data = void 0;
+ConfigUpdateRequest.prototype.config = void 0;
 
 // src/model/ConfigUpdateResponse.js
 var ConfigUpdateResponse = class _ConfigUpdateResponse {
@@ -19058,11 +19073,11 @@ var OrdersDayResponse = class _OrdersDayResponse {
     if (data) {
       obj = obj || new _OrdersDayResponse();
       if (data.hasOwnProperty("days"))
-        obj.days = ApiClient.convertToType(data["days"], [{ "String": Object }]);
+        obj.days = ApiClient.convertToType(data["days"], ["String"]);
       if (data.hasOwnProperty("orders"))
-        obj.orders = ApiClient.convertToType(data["orders"], [{ "String": Object }]);
+        obj.orders = ApiClient.convertToType(data["orders"], ["Number"]);
       if (data.hasOwnProperty("closeOrders"))
-        obj.closeOrders = ApiClient.convertToType(data["closeOrders"], [{ "String": Object }]);
+        obj.closeOrders = ApiClient.convertToType(data["closeOrders"], ["Number"]);
     }
     return obj;
   }
@@ -19272,8 +19287,12 @@ var PnlDailyPaginatedResponse = class _PnlDailyPaginatedResponse {
    * Constructs a new <code>PnlDailyPaginatedResponse</code>.
    * @alias module:model/PnlDailyPaginatedResponse
    * @class
+   * @param totalSize {Number} 
+   * @param data {Array.<Array.<Object>>} 
    */
-  constructor() {
+  constructor(totalSize, data) {
+    this.totalSize = totalSize;
+    this.data = data;
   }
   /**
    * Constructs a <code>PnlDailyPaginatedResponse</code> from a plain JavaScript object, optionally creating a new instance.
@@ -19288,7 +19307,7 @@ var PnlDailyPaginatedResponse = class _PnlDailyPaginatedResponse {
       if (data.hasOwnProperty("totalSize"))
         obj.totalSize = ApiClient.convertToType(data["totalSize"], "Number");
       if (data.hasOwnProperty("data"))
-        obj.data = ApiClient.convertToType(data["data"], [{ "String": Object }]);
+        obj.data = ApiClient.convertToType(data["data"], [[Object]]);
     }
     return obj;
   }
@@ -19486,6 +19505,7 @@ var PnlTotalResponse = class _PnlTotalResponse {
    * Constructs a new <code>PnlTotalResponse</code>.
    * @alias module:model/PnlTotalResponse
    * @class
+   * @extends 
    */
   constructor() {
   }
@@ -19499,6 +19519,7 @@ var PnlTotalResponse = class _PnlTotalResponse {
   static constructFromObject(data, obj) {
     if (data) {
       obj = obj || new _PnlTotalResponse();
+      ApiClient.constructFromObject(data, obj, "");
     }
     return obj;
   }
@@ -20247,7 +20268,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Historical Total Asset Value
+   * assetsTotal — Get Historical Total Asset Value
    * Retrieve historical total asset value in a base currency over a time range.
    * @param {module:model/AssetsTotalRequest} body 
    * @param {module:api/GunbotApi~assetsTotalCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20289,7 +20310,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Login User
+   * authLogin — Login User
    * Authenticate a user and obtain a JSON Web Token (JWT).
    * @param {module:model/LoginRequest} body 
    * @param {module:api/GunbotApi~authLoginCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20331,7 +20352,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Authentication Status
+   * authStatus — Get Authentication Status
    * Validate the current session&#x27;s authentication status using the provided token.
    * @param {module:api/GunbotApi~authStatusCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -20369,7 +20390,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Asset Balances
+   * balances — Get Asset Balances
    * Retrieve asset balances across exchanges for the authenticated user.
    * @param {module:api/GunbotApi~balancesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -20407,7 +20428,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Chart Data (Candles and Indicators)
+   * chartData — Get Chart Data (Candles and Indicators)
    * Retrieve chart data, including candles and indicators, for a specific trading pair.
    * @param {module:model/ChartDataRequest} body 
    * @param {module:api/GunbotApi~chartDataCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20449,7 +20470,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Chart Timescale Marks
+   * chartMarks — Get Chart Timescale Marks
    * Retrieve chart timescale marks (annotations like buy/sell triggers) for a pair and interval.
    * @param {String} exchange 
    * @param {String} pair 
@@ -20513,7 +20534,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Full Configuration
+   * configFull — Get Full Configuration
    * Retrieve the entire application configuration.
    * @param {module:api/GunbotApi~configFullCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -20551,7 +20572,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Add Trading Pair to Configuration
+   * configPairAdd — Add Trading Pair to Configuration
    * Add a new trading pair to the configuration.
    * @param {module:model/ConfigPairAddRequest} body 
    * @param {module:api/GunbotApi~configPairAddCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20593,7 +20614,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Remove Trading Pair from Configuration
+   * configPairRemove — Remove Trading Pair from Configuration
    * Remove a trading pair from the configuration.
    * @param {module:model/ConfigPairRemoveRequest} body 
    * @param {module:api/GunbotApi~configPairRemoveCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20635,7 +20656,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Add Trading Strategy to Configuration
+   * configStrategyAdd — Add Trading Strategy to Configuration
    * Add a new trading strategy to the configuration.
    * @param {module:model/ConfigStrategyAddRequest} body 
    * @param {module:api/GunbotApi~configStrategyAddCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20677,7 +20698,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Remove Trading Strategy from Configuration
+   * configStrategyRemove — Remove Trading Strategy from Configuration
    * Remove a trading strategy from the configuration.
    * @param {module:model/ConfigStrategyRemoveRequest} body 
    * @param {module:api/GunbotApi~configStrategyRemoveCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20719,7 +20740,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Update Full Configuration
+   * configUpdate — Update Full Configuration
    * Update the entire configuration with a new object.
    * @param {module:model/ConfigUpdateRequest} body 
    * @param {module:api/GunbotApi~configUpdateCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20761,7 +20782,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Core Memory Snapshot (All Pairs)
+   * coremem — Get Core Memory Snapshot (All Pairs)
    * Retrieve a snapshot of relevant core memory data for all active trading pairs. Data is slightly delayed and transformed for frontend use.
    * @param {module:api/GunbotApi~corememCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -20799,7 +20820,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Raw Core Memory Data for a Pair
+   * corememRequest — Get Raw Core Memory Data for a Pair
    * Retrieve raw core memory data for a specific trading pair, optionally filtered by elements.
    * @param {module:model/CoreMemRawRequest} body 
    * @param {module:api/GunbotApi~corememRequestCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20841,7 +20862,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Core Memory Snapshot (Single Pair)
+   * corememSingle — Get Core Memory Snapshot (Single Pair)
    * Retrieve a snapshot of relevant core memory data for a single active trading pair. Data is slightly delayed and transformed.
    * @param {module:model/CoreMemSingleRequest} body 
    * @param {module:api/GunbotApi~corememSingleCallback} callback The callback function, accepting three arguments: error, data, response
@@ -20883,7 +20904,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * List AutoConfig Variable Files
+   * filesAcvar — List AutoConfig Variable Files
    * List filenames of available AutoConfig variable files.
    * @param {module:api/GunbotApi~filesAcvarCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -20921,17 +20942,16 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get AutoConfig Variable File Content
+   * filesAcvarGet — Get AutoConfig Variable File Content
    * Retrieve the content of a specified AutoConfig variable file.
-   * @param {module:model/FileGetRequest} body 
+   * @param {Object} opts Optional parameters
+   * @param {module:model/FileGetRequest} opts.body 
    * @param {module:api/GunbotApi~filesAcvarGetCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  filesAcvarGet(body, callback) {
-    let postBody = body;
-    if (body === void 0 || body === null) {
-      throw new Error("Missing the required parameter 'body' when calling filesAcvarGet");
-    }
+  filesAcvarGet(opts, callback) {
+    opts = opts || {};
+    let postBody = opts["body"];
     let pathParams = {};
     let queryParams = {};
     let headerParams = {};
@@ -20963,7 +20983,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Write to autoconfig.json File
+   * filesAutoconfigWrite — Write to autoconfig.json File
    * Write content to the &#x60;autoconfig.json&#x60; file.
    * @param {module:model/FileWriteRequest} body 
    * @param {module:api/GunbotApi~filesAutoconfigWriteCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21005,7 +21025,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * List Backup Files
+   * filesBackup — List Backup Files
    * List available backup files.
    * @param {module:api/GunbotApi~filesBackupCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -21043,7 +21063,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Backup File Content
+   * filesBackupGet — Get Backup File Content
    * Retrieve the content of a specified backup config file.
    * @param {module:model/FileGetRequest} body 
    * @param {module:api/GunbotApi~filesBackupGetCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21081,11 +21101,11 @@ var GunbotApi = class {
    * Callback function to receive the result of the filesCustomEditorGet operation.
    * @callback moduleapi/GunbotApi~filesCustomEditorGetCallback
    * @param {String} error Error message, if any.
-   * @param {Object.<String, {'String': Object}>{ data The data returned by the service call.
+   * @param {'String'{ data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Custom Strategy Editor File Content
+   * filesCustomEditorGet — Get Custom Strategy Editor File Content
    * Retrieve the content of the custom strategy editor file.
    * @param {module:api/GunbotApi~filesCustomEditorGetCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -21098,8 +21118,8 @@ var GunbotApi = class {
     let formParams = {};
     let authNames = ["BearerAuth"];
     let contentTypes = [];
-    let accepts = ["application/json"];
-    let returnType = { "String": Object };
+    let accepts = ["text/plain", "application/json"];
+    let returnType = "String";
     return this.apiClient.callApi(
       "/files/custom-editor/get",
       "POST",
@@ -21123,7 +21143,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Write to Custom Strategy Editor File
+   * filesCustomEditorWrite — Write to Custom Strategy Editor File
    * Write content to the custom strategy editor file.
    * @param {module:model/FileWriteRequest} body 
    * @param {module:api/GunbotApi~filesCustomEditorWriteCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21165,7 +21185,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * List State Files
+   * filesState — List State Files
    * List filenames of available state files.
    * @param {module:api/GunbotApi~filesStateCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -21203,7 +21223,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get State File Content
+   * filesStateGet — Get State File Content
    * Retrieve the content of a specific state file.
    * @param {module:model/FileGetRequest} body 
    * @param {module:api/GunbotApi~filesStateGetCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21245,7 +21265,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * List Custom Strategy Files
+   * filesStrategy — List Custom Strategy Files
    * List filenames of available custom strategy files (JavaScript files).
    * @param {module:api/GunbotApi~filesStrategyCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -21283,7 +21303,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Delete Custom Strategy File
+   * filesStrategyDelete — Delete Custom Strategy File
    * Delete a specific custom strategy file.
    * @param {module:model/FileGetRequest} body 
    * @param {module:api/GunbotApi~filesStrategyDeleteCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21321,11 +21341,11 @@ var GunbotApi = class {
    * Callback function to receive the result of the filesStrategyGet operation.
    * @callback moduleapi/GunbotApi~filesStrategyGetCallback
    * @param {String} error Error message, if any.
-   * @param {Object.<String, {'String': Object}>{ data The data returned by the service call.
+   * @param {'String'{ data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Custom Strategy File Content
+   * filesStrategyGet — Get Custom Strategy File Content
    * Retrieve the content of a specific custom strategy file. The response is the raw content of the file, likely JavaScript code, wrapped in a JSON object.
    * @param {module:model/FileGetRequest} body 
    * @param {module:api/GunbotApi~filesStrategyGetCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21342,8 +21362,8 @@ var GunbotApi = class {
     let formParams = {};
     let authNames = ["BearerAuth"];
     let contentTypes = ["application/json"];
-    let accepts = ["application/json"];
-    let returnType = { "String": Object };
+    let accepts = ["text/plain", "application/json"];
+    let returnType = "String";
     return this.apiClient.callApi(
       "/files/strategy/get",
       "POST",
@@ -21367,7 +21387,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Write to Custom Strategy File
+   * filesStrategyWrite — Write to Custom Strategy File
    * Write JavaScript code content to a specific custom strategy file.
    * @param {module:model/FileStrategyWriteRequest} body 
    * @param {module:api/GunbotApi~filesStrategyWriteCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21409,7 +21429,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Edit License Keys
+   * licenseKeysEdit — Edit License Keys
    * Edit license keys for a wallet, optionally verifying with an exchange.
    * @param {module:model/LicenseKeysEditRequest} body 
    * @param {module:api/GunbotApi~licenseKeysEditCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21451,7 +21471,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Market Candles (OHLCV)
+   * marketCandles — Get Market Candles (OHLCV)
    * Retrieve historical OHLCV candle data for a trading pair. The &#x60;key&#x60; parameter (exchange/pair) must be URL-encoded.
    * @param {String} key URL-encoded trading pair key (e.g., &#x60;binance%2FUSDT-PEPE&#x60;).
    * @param {module:api/GunbotApi~marketCandlesCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21495,7 +21515,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Market Orderbook
+   * marketOrderbook — Get Market Orderbook
    * Retrieve current order book (bids and asks) for a trading pair. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded trading pair key (e.g., &#x60;binance%2FUSDT-PEPE&#x60;).
    * @param {module:api/GunbotApi~marketOrderbookCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21539,7 +21559,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Order History for a Pair
+   * orders — Get Order History for a Pair
    * Retrieve locally stored order history for a trading pair. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded exchange/pair key (e.g., &#x60;binance%2FUSDT-XRP&#x60;).
    * @param {module:api/GunbotApi~ordersCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21583,7 +21603,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Orders for Current Day (Multiple Pairs)
+   * ordersDay — Get Orders for Current Day (Multiple Pairs)
    * Retrieve orders from the current day for multiple trading pairs. Individual keys in &#x60;keys[]&#x60; array must be URL-encoded if they contain special characters.
    * @param {String} timezone IANA timezone (e.g., &#x60;America/New_York&#x60;).
    * @param {Array.<String>} keys Array of exchange/pair keys. Each key should be URL-encoded if needed.
@@ -21632,7 +21652,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Paginated Orders for a Pair
+   * ordersPage — Get Paginated Orders for a Pair
    * Retrieve paginated orders for a trading pair. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded exchange/pair key.
    * @param {Number} page Page number (0-indexed).
@@ -21686,7 +21706,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Paginated Orders (Multiple Pairs)
+   * ordersPageMulti — Get Paginated Orders (Multiple Pairs)
    * Retrieve paginated orders for multiple trading pairs. Individual keys in &#x60;keys[]&#x60; array must be URL-encoded if needed.
    * @param {Array.<String>} keys Array of exchange/pair keys. Each key should be URL-encoded if needed.
    * @param {Number} page Page number (0-indexed).
@@ -21740,7 +21760,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Trading Pairs
+   * pairs — Get Trading Pairs
    * Retrieve a list of trading pairs for a specified exchange. The &#x60;exchange&#x60; parameter should be URL-encoded if it contains special characters (e.g., &#x60;#&#x60; as &#x60;%23&#x60;).
    * @param {String} exchange Exchange name (e.g., &#x60;binance%233&#x60;).
    * @param {module:api/GunbotApi~pairsCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21784,7 +21804,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Detailed Trading Pairs
+   * pairsDetailed — Get Detailed Trading Pairs
    * Retrieve detailed trading pair information for a specified exchange. The &#x60;exchange&#x60; parameter should be URL-encoded if it contains special characters.
    * @param {String} exchange Exchange name (e.g., &#x60;binance%233&#x60;).
    * @param {module:api/GunbotApi~pairsDetailedCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21828,7 +21848,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Daily PNL for a Trading Key
+   * pnlDaily — Get Daily PNL for a Trading Key
    * Retrieve daily PNL data for a specific trading key within a time range. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded trading key (e.g. &#x60;binance%2FUSDT-XRP&#x60;).
    * @param {Number} startTimestamp Start timestamp (ms).
@@ -21882,7 +21902,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Paginated Daily PNL for a Trading Key
+   * pnlDailyPaginated — Get Paginated Daily PNL for a Trading Key
    * Retrieve paginated daily PNL data for a specific trading key. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded trading key.
    * @param {Number} pageNum Page number.
@@ -21941,7 +21961,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get PNL Overview
+   * pnlOverview — Get PNL Overview
    * Retrieve an overview of PNL data, summarized over time periods and trading pairs.
    * @param {module:model/PnlOverviewRequest} body 
    * @param {module:api/GunbotApi~pnlOverviewCallback} callback The callback function, accepting three arguments: error, data, response
@@ -21983,7 +22003,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get PNL Sum for an Exchange Key
+   * pnlSum — Get PNL Sum for an Exchange Key
    * Retrieve total PNL sum and investment for an exchange key over a time range. The &#x60;exchange&#x60; parameter (exchange key) must be URL-encoded.
    * @param {String} exchange URL-encoded exchange key (e.g. &#x60;binance%2FUSDT-XRP&#x60;).
    * @param {Number} startTimestamp Start timestamp (ms).
@@ -22037,7 +22057,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Total PNL for a Trading Key
+   * pnlTotal — Get Total PNL for a Trading Key
    * Retrieve total PNL for a specific trading key. The &#x60;key&#x60; parameter must be URL-encoded.
    * @param {String} key URL-encoded trading key.
    * @param {module:api/GunbotApi~pnlTotalCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22081,7 +22101,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Start System
+   * systemStart — Start System
    * Start the Gunbot system. Returns current configuration without private keys.
    * @param {module:api/GunbotApi~systemStartCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -22119,7 +22139,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Stop System
+   * systemStop — Stop System
    * Stop the Gunbot system. Returns current configuration without private keys.
    * @param {module:api/GunbotApi~systemStopCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -22157,7 +22177,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Get Server Time
+   * time — Get Server Time
    * Retrieve the current server time in milliseconds since Unix epoch.
    * @param {module:api/GunbotApi~timeCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -22195,7 +22215,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Limit Buy Order
+   * tradeBuy — Place Limit Buy Order
    * Place a limit buy order.
    * @param {module:model/TradeLimitOrderRequest} body 
    * @param {module:api/GunbotApi~tradeBuyCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22237,7 +22257,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Market Buy Order
+   * tradeBuyMarket — Place Market Buy Order
    * Place a market buy order.
    * @param {module:model/TradeMarketOrderRequest} body 
    * @param {module:api/GunbotApi~tradeBuyMarketCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22279,7 +22299,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place OCO Buy Order (Binance)
+   * tradeBuyOco — Place OCO Buy Order (Binance)
    * Place an OCO (One-Cancels-the-Other) buy order on Binance.
    * @param {module:model/TradeOcoRequest} body 
    * @param {module:api/GunbotApi~tradeBuyOcoCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22321,7 +22341,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Stop-Limit Buy Order (Binance)
+   * tradeBuyStoplimit — Place Stop-Limit Buy Order (Binance)
    * Place a stop-limit buy order on Binance.
    * @param {module:model/TradeStopLimitRequest} body 
    * @param {module:api/GunbotApi~tradeBuyStoplimitCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22363,7 +22383,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Trailing Stop Buy Order (Binance)
+   * tradeBuyTrailingstop — Place Trailing Stop Buy Order (Binance)
    * Place a trailing stop buy order on Binance. &#x60;price&#x60; is the reference price.
    * @param {module:model/TradeTrailingStopRequest} body 
    * @param {module:api/GunbotApi~tradeBuyTrailingstopCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22405,7 +22425,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Cancel Order
+   * tradeCancel — Cancel Order
    * Cancel an existing order.
    * @param {module:model/TradeCancelRequest} body 
    * @param {module:api/GunbotApi~tradeCancelCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22447,7 +22467,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Close Position with Limit Price (Bybit Futures)
+   * tradeClose — Close Position with Limit Price (Bybit Futures)
    * Close an open position at a specified limit price on Bybit (futures).
    * @param {module:model/TradeCloseLimitRequest} body 
    * @param {module:api/GunbotApi~tradeCloseCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22489,7 +22509,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Close Position at Market Price (Bybit Futures)
+   * tradeCloseMarket — Close Position at Market Price (Bybit Futures)
    * Close an open position at the current market price on Bybit (futures).
    * @param {module:model/TradeCloseMarketRequest} body 
    * @param {module:api/GunbotApi~tradeCloseMarketCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22531,7 +22551,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Limit Sell Order
+   * tradeSell — Place Limit Sell Order
    * Place a limit sell order.
    * @param {module:model/TradeLimitOrderRequest} body 
    * @param {module:api/GunbotApi~tradeSellCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22573,7 +22593,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Market Sell Order
+   * tradeSellMarket — Place Market Sell Order
    * Place a market sell order.
    * @param {module:model/TradeMarketOrderRequest} body 
    * @param {module:api/GunbotApi~tradeSellMarketCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22615,7 +22635,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place OCO Sell Order (Binance)
+   * tradeSellOco — Place OCO Sell Order (Binance)
    * Place an OCO (One-Cancels-the-Other) sell order on Binance.
    * @param {module:model/TradeOcoRequest} body 
    * @param {module:api/GunbotApi~tradeSellOcoCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22657,7 +22677,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Stop-Limit Sell Order (Binance)
+   * tradeSellStoplimit — Place Stop-Limit Sell Order (Binance)
    * Place a stop-limit sell order on Binance.
    * @param {module:model/TradeStopLimitRequest} body 
    * @param {module:api/GunbotApi~tradeSellStoplimitCallback} callback The callback function, accepting three arguments: error, data, response
@@ -22699,7 +22719,7 @@ var GunbotApi = class {
    * @param {String} response The complete HTTP response.
    */
   /**
-   * Place Trailing Stop Sell Order (Binance)
+   * tradeSellTrailingstop — Place Trailing Stop Sell Order (Binance)
    * Place a trailing stop sell order on Binance. &#x60;price&#x60; is the reference price.
    * @param {module:model/TradeTrailingStopRequest} body 
    * @param {module:api/GunbotApi~tradeSellTrailingstopCallback} callback The callback function, accepting three arguments: error, data, response

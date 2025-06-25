@@ -17,12 +17,9 @@ export default class ConfigStrategyAddRequest {
      * @alias module:model/ConfigStrategyAddRequest
      * @class
      * @param name {String} The name of the strategy to add (e.g., `myStrategy`).
+     * @param settings {Object.<String, Object>} (Optional) Specific settings for the strategy.
      */
-    constructor(name: string);
+    constructor(name: string, settings: any);
     name: string;
-    /**
-     * (Optional) Specific settings for the strategy.
-     * @member {Object.<String, Object>} settings
-     */
     settings: any;
 }

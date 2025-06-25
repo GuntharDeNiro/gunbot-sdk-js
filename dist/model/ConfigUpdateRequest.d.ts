@@ -13,11 +13,7 @@ export default class ConfigUpdateRequest {
      */
     static constructFromObject(data: any, obj: any): any;
     /**
-     * Constructs a new <code>ConfigUpdateRequest</code>.
-     * @alias module:model/ConfigUpdateRequest
-     * @class
-     * @param data {module:model/GunbotConfig}
+     * @member {module:model/GunbotConfig} config
      */
-    constructor(data: any);
-    data: any;
+    config: any;
 }

@@ -1,6 +1,6 @@
 /*
- * Gunbot REST API
- * The Gunbot REST API enables you to programmatically interact with Gunbot, a self hosted trading bot for crypto, ETFs and stocks, allowing automation and integration with your own applications and services. It gives you a single API with which you can control trading operations on many exchanges.  The API accepts and returns data in JSON format. It uses standard HTTP response codes to indicate request outcomes: - **200 OK**: The request was successful. - **400 Bad Request**: The request was invalid or cannot be processed. - **401 Unauthorized**: Authentication failed, or the user lacks necessary permissions. - **500 Internal Server Error**: A server-side error occurred.  **Gunbot Workflow:** To automate trading for any pair using the API, follow these steps: 1. Add the trading pair to the configuration with a valid strategy. 2. Start the core to activate trading operations. After completing these steps, you can access API endpoints for market data and trading actions. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers:** Gunbot uses password encryption. Refer to the original documentation for encryption helper snippets in JavaScript (Browser/Node.js), Bash, and Python. 
+ * Gunbot SDK JS
+ * The Gunbot SDK JS enables you to programmatically interact with Gunbot, a self-hosted trading bot for crypto, ETFs and stocks.  It's a single API client with which you can control automated trading operations on many exchanges. Gunbot includes unique built-in strategies, it can also run custom strategy code in js. This client lets you orchestrate and monitor trading bots.  The API client accepts and returns data in JSON format.  It uses standard HTTP response codes to indicate request outcomes:  - **200 OK** – The request was successful   - **400 Bad Request** – The request was invalid or cannot be processed   - **401 Unauthorized** – Authentication failed or the user lacks permissions   - **500 Internal Server Error** – A server-side error occurred    **Gunbot Workflow**  1. Add the trading pair to the configuration with a valid strategy.   2. Start the core to activate trading operations.    After completing these steps you can access market-data and trading endpoints. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers**  Gunbot uses password encryption. Refer to the original documentation for helper snippets in JavaScript (Browser/Node.js), Bash and Python.  **Supported Exchanges**  Gunbot ships with native connectors for more than two dozen exchanges, covering spot, futures and on-chain derivatives.   | Exchange | Spot | Futures / Perps | DeFi (on-chain) | Extra notes | | --- | :---: | :---: | :---: | --- | | **Binance** | ✔️ | ✔️ (USD-M & COIN-M) |  | Largest liquidity | | **Binance US** | ✔️ |  |  | US-regulated arm | | **Bitget** | ✔️ | ✔️ (USDT & UM perps) |  |  | | **Bybit** | ✔️ | ✔️ (USDT & inverse perps) |  |  | | **OKX** | ✔️ | ✔️ (Perps & dated futures) |  |  | | **Kraken** | ✔️ | ✔️ (via Kraken Futures) |  |  | | **KuCoin** | ✔️ |  |  |  | | **Gate.io** | ✔️ |  |  |  | | **MEXC** | ✔️ |  |  |  | | **BingX** | ✔️ |  |  |  | | **Crypto.com** | ✔️ |  |  |  | | **Huobi Global** | ✔️ |  |  |  | | **Bitfinex** | ✔️ |  |  |  | | **HitBTC** | ✔️ |  |  |  | | **Coinbase Advanced Trade** | ✔️ |  |  | Former Coinbase Pro | | **CEX.io** | ✔️ |  |  |  | | **Poloniex** | ✔️ |  |  |  | | **Alpaca** (stocks & crypto) | ✔️ |  |  |  | | **dYdX (v3/v4)** |  | ✔️ | ✔️ | Perpetual DEX | | **HyperLiquid** | ✔️ | ✔️ | ✔️ | DeFi perps | | **PancakeSwap** |  | ✔️ | ✔️ | BSC DEX | | **Bitmex / Bitmex Testnet** |  | ✔️ |  |  |
  *
  * OpenAPI spec version: v1
  * Contact: support@gunbot.freshdesk.com
@@ -22,9 +22,9 @@
     factory(require('expect.js'), require('../../src/index'));
   } else {
     // Browser globals (root is window)
-    factory(root.expect, root.GunbotRestApi);
+    factory(root.expect, root.GunbotSdkJs);
   }
-}(this, function(expect, GunbotRestApi) {
+}(this, function(expect, GunbotSdkJs) {
   'use strict';
 
   var instance;
@@ -32,12 +32,12 @@
   describe('(package)', function() {
     describe('TradeMarketOrderData', function() {
       beforeEach(function() {
-        instance = new GunbotRestApi.TradeMarketOrderData();
+        instance = new GunbotSdkJs.TradeMarketOrderData();
       });
 
       it('should create an instance of TradeMarketOrderData', function() {
         // TODO: update the code to test TradeMarketOrderData
-        expect(instance).to.be.a(GunbotRestApi.TradeMarketOrderData);
+        expect(instance).to.be.a(GunbotSdkJs.TradeMarketOrderData);
       });
 
       it('should have the property exch (base name: "exch")', function() {

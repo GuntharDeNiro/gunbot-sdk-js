@@ -1,6 +1,6 @@
 /*
- * Gunbot REST API
- * The Gunbot REST API enables you to programmatically interact with Gunbot, a self hosted trading bot for crypto, ETFs and stocks, allowing automation and integration with your own applications and services. It gives you a single API with which you can control trading operations on many exchanges.  The API accepts and returns data in JSON format. It uses standard HTTP response codes to indicate request outcomes: - **200 OK**: The request was successful. - **400 Bad Request**: The request was invalid or cannot be processed. - **401 Unauthorized**: Authentication failed, or the user lacks necessary permissions. - **500 Internal Server Error**: A server-side error occurred.  **Gunbot Workflow:** To automate trading for any pair using the API, follow these steps: 1. Add the trading pair to the configuration with a valid strategy. 2. Start the core to activate trading operations. After completing these steps, you can access API endpoints for market data and trading actions. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers:** Gunbot uses password encryption. Refer to the original documentation for encryption helper snippets in JavaScript (Browser/Node.js), Bash, and Python. 
+ * Gunbot SDK JS
+ * The Gunbot SDK JS enables you to programmatically interact with Gunbot, a self-hosted trading bot for crypto, ETFs and stocks.  It's a single API client with which you can control automated trading operations on many exchanges. Gunbot includes unique built-in strategies, it can also run custom strategy code in js. This client lets you orchestrate and monitor trading bots.  The API client accepts and returns data in JSON format.  It uses standard HTTP response codes to indicate request outcomes:  - **200 OK** – The request was successful   - **400 Bad Request** – The request was invalid or cannot be processed   - **401 Unauthorized** – Authentication failed or the user lacks permissions   - **500 Internal Server Error** – A server-side error occurred    **Gunbot Workflow**  1. Add the trading pair to the configuration with a valid strategy.   2. Start the core to activate trading operations.    After completing these steps you can access market-data and trading endpoints. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers**  Gunbot uses password encryption. Refer to the original documentation for helper snippets in JavaScript (Browser/Node.js), Bash and Python.  **Supported Exchanges**  Gunbot ships with native connectors for more than two dozen exchanges, covering spot, futures and on-chain derivatives.   | Exchange | Spot | Futures / Perps | DeFi (on-chain) | Extra notes | | --- | :---: | :---: | :---: | --- | | **Binance** | ✔️ | ✔️ (USD-M & COIN-M) |  | Largest liquidity | | **Binance US** | ✔️ |  |  | US-regulated arm | | **Bitget** | ✔️ | ✔️ (USDT & UM perps) |  |  | | **Bybit** | ✔️ | ✔️ (USDT & inverse perps) |  |  | | **OKX** | ✔️ | ✔️ (Perps & dated futures) |  |  | | **Kraken** | ✔️ | ✔️ (via Kraken Futures) |  |  | | **KuCoin** | ✔️ |  |  |  | | **Gate.io** | ✔️ |  |  |  | | **MEXC** | ✔️ |  |  |  | | **BingX** | ✔️ |  |  |  | | **Crypto.com** | ✔️ |  |  |  | | **Huobi Global** | ✔️ |  |  |  | | **Bitfinex** | ✔️ |  |  |  | | **HitBTC** | ✔️ |  |  |  | | **Coinbase Advanced Trade** | ✔️ |  |  | Former Coinbase Pro | | **CEX.io** | ✔️ |  |  |  | | **Poloniex** | ✔️ |  |  |  | | **Alpaca** (stocks & crypto) | ✔️ |  |  |  | | **dYdX (v3/v4)** |  | ✔️ | ✔️ | Perpetual DEX | | **HyperLiquid** | ✔️ | ✔️ | ✔️ | DeFi perps | | **PancakeSwap** |  | ✔️ | ✔️ | BSC DEX | | **Bitmex / Bitmex Testnet** |  | ✔️ |  |  |
  *
  * OpenAPI spec version: v1
  * Contact: support@gunbot.freshdesk.com
@@ -40,28 +40,31 @@ export default class OrdersDayResponse {
     if (data) {
       obj = obj || new OrdersDayResponse();
       if (data.hasOwnProperty('days'))
-        obj.days = ApiClient.convertToType(data['days'], [{'String': Object}]);
+        obj.days = ApiClient.convertToType(data['days'], ['String']);
       if (data.hasOwnProperty('orders'))
-        obj.orders = ApiClient.convertToType(data['orders'], [{'String': Object}]);
+        obj.orders = ApiClient.convertToType(data['orders'], ['Number']);
       if (data.hasOwnProperty('closeOrders'))
-        obj.closeOrders = ApiClient.convertToType(data['closeOrders'], [{'String': Object}]);
+        obj.closeOrders = ApiClient.convertToType(data['closeOrders'], ['Number']);
     }
     return obj;
   }
 }
 
 /**
- * @member {Array.<Object.<String, Object>>} days
+ * ISO-8601 dates.
+ * @member {Array.<String>} days
  */
 OrdersDayResponse.prototype.days = undefined;
 
 /**
- * @member {Array.<Object.<String, Object>>} orders
+ * Order count per day.
+ * @member {Array.<Number>} orders
  */
 OrdersDayResponse.prototype.orders = undefined;
 
 /**
- * @member {Array.<Object.<String, Object>>} closeOrders
+ * Close order count per day.
+ * @member {Array.<Number>} closeOrders
  */
 OrdersDayResponse.prototype.closeOrders = undefined;
 

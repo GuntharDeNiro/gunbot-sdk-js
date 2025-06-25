@@ -1,6 +1,6 @@
 /*
- * Gunbot REST API
- * The Gunbot REST API enables you to programmatically interact with Gunbot, a self hosted trading bot for crypto, ETFs and stocks, allowing automation and integration with your own applications and services. It gives you a single API with which you can control trading operations on many exchanges.  The API accepts and returns data in JSON format. It uses standard HTTP response codes to indicate request outcomes: - **200 OK**: The request was successful. - **400 Bad Request**: The request was invalid or cannot be processed. - **401 Unauthorized**: Authentication failed, or the user lacks necessary permissions. - **500 Internal Server Error**: A server-side error occurred.  **Gunbot Workflow:** To automate trading for any pair using the API, follow these steps: 1. Add the trading pair to the configuration with a valid strategy. 2. Start the core to activate trading operations. After completing these steps, you can access API endpoints for market data and trading actions. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers:** Gunbot uses password encryption. Refer to the original documentation for encryption helper snippets in JavaScript (Browser/Node.js), Bash, and Python. 
+ * Gunbot SDK JS
+ * The Gunbot SDK JS enables you to programmatically interact with Gunbot, a self-hosted trading bot for crypto, ETFs and stocks.  It's a single API client with which you can control automated trading operations on many exchanges. Gunbot includes unique built-in strategies, it can also run custom strategy code in js. This client lets you orchestrate and monitor trading bots.  The API client accepts and returns data in JSON format.  It uses standard HTTP response codes to indicate request outcomes:  - **200 OK** – The request was successful   - **400 Bad Request** – The request was invalid or cannot be processed   - **401 Unauthorized** – Authentication failed or the user lacks permissions   - **500 Internal Server Error** – A server-side error occurred    **Gunbot Workflow**  1. Add the trading pair to the configuration with a valid strategy.   2. Start the core to activate trading operations.    After completing these steps you can access market-data and trading endpoints. Gunbot will actively monitor and execute strategies for the specified pairs.  **Encryption Helpers**  Gunbot uses password encryption. Refer to the original documentation for helper snippets in JavaScript (Browser/Node.js), Bash and Python.  **Supported Exchanges**  Gunbot ships with native connectors for more than two dozen exchanges, covering spot, futures and on-chain derivatives.   | Exchange | Spot | Futures / Perps | DeFi (on-chain) | Extra notes | | --- | :---: | :---: | :---: | --- | | **Binance** | ✔️ | ✔️ (USD-M & COIN-M) |  | Largest liquidity | | **Binance US** | ✔️ |  |  | US-regulated arm | | **Bitget** | ✔️ | ✔️ (USDT & UM perps) |  |  | | **Bybit** | ✔️ | ✔️ (USDT & inverse perps) |  |  | | **OKX** | ✔️ | ✔️ (Perps & dated futures) |  |  | | **Kraken** | ✔️ | ✔️ (via Kraken Futures) |  |  | | **KuCoin** | ✔️ |  |  |  | | **Gate.io** | ✔️ |  |  |  | | **MEXC** | ✔️ |  |  |  | | **BingX** | ✔️ |  |  |  | | **Crypto.com** | ✔️ |  |  |  | | **Huobi Global** | ✔️ |  |  |  | | **Bitfinex** | ✔️ |  |  |  | | **HitBTC** | ✔️ |  |  |  | | **Coinbase Advanced Trade** | ✔️ |  |  | Former Coinbase Pro | | **CEX.io** | ✔️ |  |  |  | | **Poloniex** | ✔️ |  |  |  | | **Alpaca** (stocks & crypto) | ✔️ |  |  |  | | **dYdX (v3/v4)** |  | ✔️ | ✔️ | Perpetual DEX | | **HyperLiquid** | ✔️ | ✔️ | ✔️ | DeFi perps | | **PancakeSwap** |  | ✔️ | ✔️ | BSC DEX | | **Bitmex / Bitmex Testnet** |  | ✔️ |  |  |
  *
  * OpenAPI spec version: v1
  * Contact: support@gunbot.freshdesk.com
@@ -22,15 +22,15 @@
     factory(require('expect.js'), require('../../src/index'));
   } else {
     // Browser globals (root is window)
-    factory(root.expect, root.GunbotRestApi);
+    factory(root.expect, root.GunbotSdkJs);
   }
-}(this, function(expect, GunbotRestApi) {
+}(this, function(expect, GunbotSdkJs) {
   'use strict';
 
   var instance;
 
   beforeEach(function() {
-    instance = new GunbotRestApi.GunbotApi();
+    instance = new GunbotSdkJs.GunbotApi();
   });
 
   describe('(package)', function() {
@@ -46,7 +46,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.AssetsTotalResponse);
+            expect(data).to.be.a(GunbotSdkJs.AssetsTotalResponse);
 
             done();
           });
@@ -66,7 +66,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.LoginResponse);
+            expect(data).to.be.a(GunbotSdkJs.LoginResponse);
 
             done();
           });
@@ -86,7 +86,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.AuthStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.AuthStatusResponse);
 
             done();
           });
@@ -106,7 +106,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.BalancesResponse);
+            expect(data).to.be.a(GunbotSdkJs.BalancesResponse);
 
             done();
           });
@@ -126,7 +126,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.ChartDataResponse);
+            expect(data).to.be.a(GunbotSdkJs.ChartDataResponse);
 
             done();
           });
@@ -146,7 +146,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.ChartMarksResponse);
+            expect(data).to.be.a(GunbotSdkJs.ChartMarksResponse);
 
             done();
           });
@@ -166,7 +166,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.ConfigFullResponse);
+            expect(data).to.be.a(GunbotSdkJs.ConfigFullResponse);
 
             done();
           });
@@ -186,7 +186,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -206,7 +206,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -226,7 +226,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -246,7 +246,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -266,7 +266,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.ConfigUpdateResponse);
+            expect(data).to.be.a(GunbotSdkJs.ConfigUpdateResponse);
 
             done();
           });
@@ -286,7 +286,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.CoreMemSnapshotResponse);
+            expect(data).to.be.a(GunbotSdkJs.CoreMemSnapshotResponse);
 
             done();
           });
@@ -306,7 +306,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.CoreMemRawResponse);
+            expect(data).to.be.a(GunbotSdkJs.CoreMemRawResponse);
 
             done();
           });
@@ -326,7 +326,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.CoreMemSnapshotResponse);
+            expect(data).to.be.a(GunbotSdkJs.CoreMemSnapshotResponse);
 
             done();
           });
@@ -346,7 +346,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileListResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileListResponse);
 
             done();
           });
@@ -359,14 +359,15 @@
         it('should call filesAcvarGet successfully', function(done) {
           // TODO: uncomment, update parameter values for filesAcvarGet call and complete the assertions
           /*
+          var opts = {};
 
-          instance.filesAcvarGet(body, function(error, data, response) {
+          instance.filesAcvarGet(opts, function(error, data, response) {
             if (error) {
               done(error);
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileAclarContentResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileAclarContentResponse);
 
             done();
           });
@@ -386,7 +387,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -406,7 +407,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileListResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileListResponse);
 
             done();
           });
@@ -426,7 +427,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileContentResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileContentResponse);
 
             done();
           });
@@ -446,14 +447,8 @@
               return;
             }
             // TODO: update response assertions
-            let dataCtr = data;
-            expect(dataCtr).to.be.an(Object);
-            expect(dataCtr).to.not.be.empty();
-            for (let p in dataCtr) {
-              let data = dataCtr[p];
-              expect(data).to.be.a(Object);
-              // expect(data).to.be(null);
-            }
+            expect(data).to.be.a(&#x27;string&#x27;);
+            // expect(data).to.be(null);
 
             done();
           });
@@ -473,7 +468,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -493,7 +488,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileListResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileListResponse);
 
             done();
           });
@@ -513,7 +508,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileStateContentResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileStateContentResponse);
 
             done();
           });
@@ -533,7 +528,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.FileListResponse);
+            expect(data).to.be.a(GunbotSdkJs.FileListResponse);
 
             done();
           });
@@ -553,7 +548,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -573,14 +568,8 @@
               return;
             }
             // TODO: update response assertions
-            let dataCtr = data;
-            expect(dataCtr).to.be.an(Object);
-            expect(dataCtr).to.not.be.empty();
-            for (let p in dataCtr) {
-              let data = dataCtr[p];
-              expect(data).to.be.a(Object);
-              // expect(data).to.be(null);
-            }
+            expect(data).to.be.a(&#x27;string&#x27;);
+            // expect(data).to.be(null);
 
             done();
           });
@@ -600,7 +589,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -620,7 +609,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SuccessStatusResponse);
+            expect(data).to.be.a(GunbotSdkJs.SuccessStatusResponse);
 
             done();
           });
@@ -640,7 +629,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.MarketCandlesResponse);
+            expect(data).to.be.a(GunbotSdkJs.MarketCandlesResponse);
 
             done();
           });
@@ -660,7 +649,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.MarketOrderbookResponse);
+            expect(data).to.be.a(GunbotSdkJs.MarketOrderbookResponse);
 
             done();
           });
@@ -680,7 +669,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.OrdersResponse);
+            expect(data).to.be.a(GunbotSdkJs.OrdersResponse);
 
             done();
           });
@@ -700,7 +689,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.OrdersDayResponse);
+            expect(data).to.be.a(GunbotSdkJs.OrdersDayResponse);
 
             done();
           });
@@ -720,7 +709,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.OrdersPageResponse);
+            expect(data).to.be.a(GunbotSdkJs.OrdersPageResponse);
 
             done();
           });
@@ -740,7 +729,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.OrdersPageMultiResponse);
+            expect(data).to.be.a(GunbotSdkJs.OrdersPageMultiResponse);
 
             done();
           });
@@ -760,7 +749,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PairsResponse);
+            expect(data).to.be.a(GunbotSdkJs.PairsResponse);
 
             done();
           });
@@ -780,7 +769,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PairsDetailedResponse);
+            expect(data).to.be.a(GunbotSdkJs.PairsDetailedResponse);
 
             done();
           });
@@ -800,7 +789,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PnlDailyResponse);
+            expect(data).to.be.a(GunbotSdkJs.PnlDailyResponse);
 
             done();
           });
@@ -820,7 +809,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PnlDailyPaginatedResponse);
+            expect(data).to.be.a(GunbotSdkJs.PnlDailyPaginatedResponse);
 
             done();
           });
@@ -840,7 +829,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PnlOverviewResponse);
+            expect(data).to.be.a(GunbotSdkJs.PnlOverviewResponse);
 
             done();
           });
@@ -860,7 +849,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PnlSumResponse);
+            expect(data).to.be.a(GunbotSdkJs.PnlSumResponse);
 
             done();
           });
@@ -880,7 +869,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.PnlTotalResponse);
+            expect(data).to.be.a(GunbotSdkJs.PnlTotalResponse);
 
             done();
           });
@@ -900,7 +889,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SystemActionResponse);
+            expect(data).to.be.a(GunbotSdkJs.SystemActionResponse);
 
             done();
           });
@@ -920,7 +909,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.SystemActionResponse);
+            expect(data).to.be.a(GunbotSdkJs.SystemActionResponse);
 
             done();
           });
@@ -940,7 +929,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TimeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TimeResponse);
 
             done();
           });
@@ -960,7 +949,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -980,7 +969,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1000,7 +989,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1020,7 +1009,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1040,7 +1029,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1060,7 +1049,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1080,7 +1069,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1100,7 +1089,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1120,7 +1109,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1140,7 +1129,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1160,7 +1149,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1180,7 +1169,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });
@@ -1200,7 +1189,7 @@
               return;
             }
             // TODO: update response assertions
-            expect(data).to.be.a(GunbotRestApi.TradeResponse);
+            expect(data).to.be.a(GunbotSdkJs.TradeResponse);
 
             done();
           });

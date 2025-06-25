@@ -18,10 +18,18 @@ info:
     - **401 Unauthorized** – Authentication failed or the user lacks permissions  
     - **500 Internal Server Error** – A server-side error occurred  
 
+    **Gunbot Workflow**
+
+    1. Add the trading pair to the configuration with a valid strategy.  
+    2. Start the core to activate trading operations.  
+
+    After completing these steps you can access market-data and trading endpoints.
+    Gunbot will actively monitor and execute strategies for the specified pairs.
+
     **Encryption Helpers**
 
-    Gunbot uses password encryption. Refer to the original documentation for [helper
-    snippets](https://www.gunbot.com/support/docs/rest-api/api-auth/#encryption-helpers). Alternatively, copy and use the bearer token from the localstorage of an active Gunbot GUI session.
+    Gunbot uses password encryption. Refer to the original documentation for helper
+    snippets in JavaScript (Browser/Node.js), Bash and Python.
 
     **Supported Exchanges**
 
@@ -52,15 +60,6 @@ info:
     | **HyperLiquid** | ✔️ | ✔️ | ✔️ | DeFi perps |
     | **PancakeSwap** |  | ✔️ | ✔️ | BSC DEX |
     | **Bitmex / Bitmex Testnet** |  | ✔️ |  |  |
-
-    **Gunbot Workflow**
-
-    1. Add the trading pair to the configuration with a valid strategy.  
-    2. Start the core to activate trading operations.  
-
-    After completing these steps you can access market-data and trading endpoints.
-    Gunbot will actively monitor and execute strategies for the specified pairs.
-
   contact:
     name: Gunbot
     url: https://www.gunbot.com
@@ -68,15 +67,1648 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-security:
-  - BearerAuth: []
 servers:
   - url: http://your-gunbot-instance.com:3000/api/v1
-    description: Local Gunbot instance (HTTP). Replace `your-gunbot-instance.com`
-      with the actual domain or IP. The port is identical to the GUI port.
+    description: Local Gunbot instance (HTTP). Replace `your-gunbot-instance.com` with the actual domain or IP. The port is identical to the GUI port.
   - url: https://your-gunbot-instance.com:3000/api/v1
-    description: Gunbot instance (HTTPS). When not using the API on localhost, make
-      sure to configure https.
+    description: Gunbot instance (HTTPS). When not using the API on localhost, make sure to configure https.
+security:
+  - BearerAuth: []
+tags:
+  - name: Gunbot
+    description: All Gunbot endpoints
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Gunbot
+      summary: authLogin — authLogin — Login User
+      description: Authenticate a user and obtain a JSON Web Token (JWT).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: authLogin
+  /auth/status:
+    get:
+      tags:
+        - Gunbot
+      summary: authStatus — authStatus — Get Authentication Status
+      description: Validate the current session's authentication status using the provided token.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authentication status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: authStatus
+  /balances:
+    post:
+      tags:
+        - Gunbot
+      summary: balances — balances — Get Asset Balances
+      description: Retrieve asset balances across exchanges for the authenticated user.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Balances retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: balances
+  /assets/total:
+    post:
+      tags:
+        - Gunbot
+      summary: assetsTotal — assetsTotal — Get Historical Total Asset Value
+      description: Retrieve historical total asset value in a base currency over a time range.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetsTotalRequest'
+      responses:
+        '200':
+          description: Historical asset values retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetsTotalResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: assetsTotal
+  /pairs:
+    get:
+      tags:
+        - Gunbot
+      summary: pairs — pairs — Get Trading Pairs
+      description: Retrieve a list of trading pairs for a specified exchange. The `exchange` parameter should be URL-encoded if it contains special characters (e.g., `#` as `%23`).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: exchange
+          in: query
+          required: true
+          description: Exchange name (e.g., `binance%233`).
+          schema:
+            type: string
+          example: binance%233
+      responses:
+        '200':
+          description: Trading pairs retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pairs
+  /pairs/detailed:
+    get:
+      tags:
+        - Gunbot
+      summary: pairsDetailed — pairsDetailed — Get Detailed Trading Pairs
+      description: Retrieve detailed trading pair information for a specified exchange. The `exchange` parameter should be URL-encoded if it contains special characters.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: exchange
+          in: query
+          required: true
+          description: Exchange name (e.g., `binance%233`).
+          schema:
+            type: string
+          example: binance%233
+      responses:
+        '200':
+          description: Detailed trading pair information retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairsDetailedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pairsDetailed
+  /config/full:
+    get:
+      tags:
+        - Gunbot
+      summary: configFull — configFull — Get Full Configuration
+      description: Retrieve the entire application configuration.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Full configuration retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigFullResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configFull
+  /config/update:
+    post:
+      tags:
+        - Gunbot
+      summary: configUpdate — configUpdate — Update Full Configuration
+      description: Update the entire configuration with a new object.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigUpdateRequest'
+      responses:
+        '200':
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigUpdateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configUpdate
+  /config/pair/add:
+    post:
+      tags:
+        - Gunbot
+      summary: configPairAdd — configPairAdd — Add Trading Pair to Configuration
+      description: Add a new trading pair to the configuration.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigPairAddRequest'
+      responses:
+        '200':
+          description: Trading pair added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configPairAdd
+  /config/pair/remove:
+    post:
+      tags:
+        - Gunbot
+      summary: configPairRemove — configPairRemove — Remove Trading Pair from Configuration
+      description: Remove a trading pair from the configuration.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigPairRemoveRequest'
+      responses:
+        '200':
+          description: Trading pair removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configPairRemove
+  /config/strategy/add:
+    post:
+      tags:
+        - Gunbot
+      summary: configStrategyAdd — configStrategyAdd — Add Trading Strategy to Configuration
+      description: Add a new trading strategy to the configuration.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigStrategyAddRequest'
+      responses:
+        '200':
+          description: Trading strategy added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configStrategyAdd
+  /config/strategy/remove:
+    post:
+      tags:
+        - Gunbot
+      summary: configStrategyRemove — configStrategyRemove — Remove Trading Strategy from Configuration
+      description: Remove a trading strategy from the configuration.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigStrategyRemoveRequest'
+      responses:
+        '200':
+          description: Trading strategy removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: configStrategyRemove
+  /files/acvar:
+    get:
+      tags:
+        - Gunbot
+      summary: filesAcvar — filesAcvar — List AutoConfig Variable Files
+      description: List filenames of available AutoConfig variable files.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: AutoConfig variable files listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesAcvar
+  /files/acvar/get:
+    post:
+      tags:
+        - Gunbot
+      summary: filesAcvarGet — filesAcvarGet — Get AutoConfig Variable File Content
+      description: Retrieve the content of a specified AutoConfig variable file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetRequest'
+      responses:
+        '200':
+          description: AutoConfig variable file content retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileAclarContentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesAcvarGet
+  /files/autoconfig/write:
+    post:
+      tags:
+        - Gunbot
+      summary: filesAutoconfigWrite — filesAutoconfigWrite — Write to autoconfig.json File
+      description: Write content to the `autoconfig.json` file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileWriteRequest'
+      responses:
+        '200':
+          description: Content written to autoconfig.json
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesAutoconfigWrite
+  /files/backup:
+    post:
+      tags:
+        - Gunbot
+      summary: filesBackup — filesBackup — List Backup Files
+      description: List available backup files.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Backup files listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesBackup
+  /files/backup/get:
+    post:
+      tags:
+        - Gunbot
+      summary: filesBackupGet — filesBackupGet — Get Backup File Content
+      description: Retrieve the content of a specified backup config file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetRequest'
+      responses:
+        '200':
+          description: Backup file content retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileContentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesBackupGet
+  /files/custom-editor/get:
+    post:
+      tags:
+        - Gunbot
+      summary: filesCustomEditorGet — filesCustomEditorGet — Get Custom Strategy Editor File Content
+      description: Retrieve the content of the custom strategy editor file.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Custom strategy editor file content retrieved
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesCustomEditorGet
+  /files/custom-editor/write:
+    post:
+      tags:
+        - Gunbot
+      summary: filesCustomEditorWrite — filesCustomEditorWrite — Write to Custom Strategy Editor File
+      description: Write content to the custom strategy editor file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileWriteRequest'
+      responses:
+        '200':
+          description: Content written to custom strategy editor file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesCustomEditorWrite
+  /files/state:
+    get:
+      tags:
+        - Gunbot
+      summary: filesState — filesState — List State Files
+      description: List filenames of available state files.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: State files listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesState
+  /files/state/get:
+    post:
+      tags:
+        - Gunbot
+      summary: filesStateGet — filesStateGet — Get State File Content
+      description: Retrieve the content of a specific state file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetRequest'
+      responses:
+        '200':
+          description: State file content retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileStateContentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesStateGet
+  /files/strategy:
+    get:
+      tags:
+        - Gunbot
+      summary: filesStrategy — filesStrategy — List Custom Strategy Files
+      description: List filenames of available custom strategy files (JavaScript files).
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Custom strategy files listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesStrategy
+  /files/strategy/get:
+    post:
+      tags:
+        - Gunbot
+      summary: filesStrategyGet — filesStrategyGet — Get Custom Strategy File Content
+      description: Retrieve the content of a specific custom strategy file. The response is the raw content of the file, likely JavaScript code, wrapped in a JSON object.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetRequest'
+      responses:
+        '200':
+          description: Custom strategy file content retrieved. Example shows an empty object, actual content would be the file's text if it were wrapped.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesStrategyGet
+  /files/strategy/write:
+    post:
+      tags:
+        - Gunbot
+      summary: filesStrategyWrite — filesStrategyWrite — Write to Custom Strategy File
+      description: Write JavaScript code content to a specific custom strategy file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileStrategyWriteRequest'
+      responses:
+        '200':
+          description: Content written to custom strategy file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesStrategyWrite
+  /files/strategy/delete:
+    post:
+      tags:
+        - Gunbot
+      summary: filesStrategyDelete — filesStrategyDelete — Delete Custom Strategy File
+      description: Delete a specific custom strategy file.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetRequest'
+      responses:
+        '200':
+          description: Custom strategy file deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: filesStrategyDelete
+  /market/candles:
+    get:
+      tags:
+        - Gunbot
+      summary: marketCandles — marketCandles — Get Market Candles (OHLCV)
+      description: Retrieve historical OHLCV candle data for a trading pair. The `key` parameter (exchange/pair) must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded trading pair key (e.g., `binance%2FUSDT-PEPE`).
+          schema:
+            type: string
+          example: binance%2FUSDT-PEPE
+      responses:
+        '200':
+          description: Candle data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketCandlesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: marketCandles
+  /market/orderbook:
+    get:
+      tags:
+        - Gunbot
+      summary: marketOrderbook — marketOrderbook — Get Market Orderbook
+      description: Retrieve current order book (bids and asks) for a trading pair. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded trading pair key (e.g., `binance%2FUSDT-PEPE`).
+          schema:
+            type: string
+          example: binance%2FUSDT-PEPE
+      responses:
+        '200':
+          description: Order book data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketOrderbookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: marketOrderbook
+  /coremem/raw:
+    post:
+      tags:
+        - Gunbot
+      summary: corememRequest — corememRequest — Get Raw Core Memory Data for a Pair
+      description: Retrieve raw core memory data for a specific trading pair, optionally filtered by elements.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreMemRawRequest'
+      responses:
+        '200':
+          description: Raw core memory data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreMemRawResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: corememRequest
+  /coremem:
+    post:
+      tags:
+        - Gunbot
+      summary: coremem — coremem — Get Core Memory Snapshot (All Pairs)
+      description: Retrieve a snapshot of relevant core memory data for all active trading pairs. Data is slightly delayed and transformed for frontend use.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Core memory snapshot retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreMemSnapshotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: coremem
+  /coremem/single:
+    post:
+      tags:
+        - Gunbot
+      summary: corememSingle — corememSingle — Get Core Memory Snapshot (Single Pair)
+      description: Retrieve a snapshot of relevant core memory data for a single active trading pair. Data is slightly delayed and transformed.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreMemSingleRequest'
+      responses:
+        '200':
+          description: Single pair core memory snapshot retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreMemSnapshotResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: corememSingle
+  /chart/data:
+    post:
+      tags:
+        - Gunbot
+      summary: chartData — chartData — Get Chart Data (Candles and Indicators)
+      description: Retrieve chart data, including candles and indicators, for a specific trading pair.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChartDataRequest'
+      responses:
+        '200':
+          description: Chart data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: chartData
+  /chart/marks:
+    get:
+      tags:
+        - Gunbot
+      summary: chartMarks — chartMarks — Get Chart Timescale Marks
+      description: Retrieve chart timescale marks (annotations like buy/sell triggers) for a pair and interval.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: exchange
+          in: query
+          required: true
+          schema:
+            type: string
+          example: binance
+        - name: pair
+          in: query
+          required: true
+          schema:
+            type: string
+          example: USDT-XRP
+        - name: interval
+          in: query
+          required: true
+          description: Time interval in minutes.
+          schema:
+            type: string
+          example: '15'
+        - name: startTime
+          in: query
+          required: true
+          description: Start time (UNIX timestamp seconds).
+          schema:
+            type: string
+          example: '0'
+        - name: endTime
+          in: query
+          required: true
+          description: End time (UNIX timestamp seconds).
+          schema:
+            type: string
+          example: '2114377200'
+      responses:
+        '200':
+          description: Chart marks retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartMarksResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: chartMarks
+  /pnl/overview:
+    post:
+      tags:
+        - Gunbot
+      summary: pnlOverview — pnlOverview — Get PNL Overview
+      description: Retrieve an overview of PNL data, summarized over time periods and trading pairs.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PnlOverviewRequest'
+      responses:
+        '200':
+          description: PNL overview retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PnlOverviewResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pnlOverview
+  /pnl/daily:
+    get:
+      tags:
+        - Gunbot
+      summary: pnlDaily — pnlDaily — Get Daily PNL for a Trading Key
+      description: Retrieve daily PNL data for a specific trading key within a time range. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded trading key (e.g. `binance%2FUSDT-XRP`).
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+        - name: startTimestamp
+          in: query
+          required: true
+          description: Start timestamp (ms).
+          schema:
+            type: integer
+            format: int64
+          example: 0
+        - name: endTimestamp
+          in: query
+          required: true
+          description: End timestamp (ms).
+          schema:
+            type: integer
+            format: int64
+          example: 1733307452623
+      responses:
+        '200':
+          description: Daily PNL data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PnlDailyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pnlDaily
+  /pnl/daily/paginated:
+    get:
+      tags:
+        - Gunbot
+      summary: pnlDailyPaginated — pnlDailyPaginated — Get Paginated Daily PNL for a Trading Key
+      description: Retrieve paginated daily PNL data for a specific trading key. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded trading key.
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+        - name: pageNum
+          in: query
+          required: true
+          description: Page number.
+          schema:
+            type: integer
+          example: 1
+        - name: pageSize
+          in: query
+          required: true
+          description: Records per page.
+          schema:
+            type: integer
+          example: 10
+        - name: endTime
+          in: query
+          required: true
+          description: End timestamp (ms).
+          schema:
+            type: integer
+            format: int64
+          example: 1733307452649
+      responses:
+        '200':
+          description: Paginated daily PNL data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PnlDailyPaginatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pnlDailyPaginated
+  /pnl/sum:
+    get:
+      tags:
+        - Gunbot
+      summary: pnlSum — pnlSum — Get PNL Sum for an Exchange Key
+      description: Retrieve total PNL sum and investment for an exchange key over a time range. The `exchange` parameter (exchange key) must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: exchange
+          in: query
+          required: true
+          description: URL-encoded exchange key (e.g. `binance%2FUSDT-XRP`).
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+        - name: startTimestamp
+          in: query
+          required: true
+          description: Start timestamp (ms).
+          schema:
+            type: integer
+            format: int64
+          example: 0
+        - name: endTimestamp
+          in: query
+          required: true
+          description: End timestamp (ms).
+          schema:
+            type: integer
+            format: int64
+          example: 1733307452649
+      responses:
+        '200':
+          description: PNL sum retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PnlSumResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pnlSum
+  /pnl/total:
+    get:
+      tags:
+        - Gunbot
+      summary: pnlTotal — pnlTotal — Get Total PNL for a Trading Key
+      description: Retrieve total PNL for a specific trading key. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded trading key.
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+      responses:
+        '200':
+          description: Total PNL retrieved (example shows empty object)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PnlTotalResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: pnlTotal
+  /system/start:
+    post:
+      tags:
+        - Gunbot
+      summary: systemStart — systemStart — Start System
+      description: Start the Gunbot system. Returns current configuration without private keys.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: System started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemActionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: systemStart
+  /system/stop:
+    post:
+      tags:
+        - Gunbot
+      summary: systemStop — systemStop — Stop System
+      description: Stop the Gunbot system. Returns current configuration without private keys.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: System stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemActionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: systemStop
+  /time:
+    get:
+      tags:
+        - Gunbot
+      summary: time — time — Get Server Time
+      description: Retrieve the current server time in milliseconds since Unix epoch.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Server time retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: time
+  /license/keys/edit:
+    post:
+      tags:
+        - Gunbot
+      summary: licenseKeysEdit — licenseKeysEdit — Edit License Keys
+      description: Edit license keys for a wallet, optionally verifying with an exchange.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicenseKeysEditRequest'
+      responses:
+        '200':
+          description: License keys edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: licenseKeysEdit
+  /trade/buy:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeBuy — tradeBuy — Place Limit Buy Order
+      description: Place a limit buy order.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeLimitOrderRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 50000
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeBuy
+  /trade/buy/market:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeBuyMarket — tradeBuyMarket — Place Market Buy Order
+      description: Place a market buy order.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeMarketOrderRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeBuyMarket
+  /trade/sell:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeSell — tradeSell — Place Limit Sell Order
+      description: Place a limit sell order.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeLimitOrderRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 52500
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeSell
+  /trade/sell/market:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeSellMarket — tradeSellMarket — Place Market Sell Order
+      description: Place a market sell order.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeMarketOrderRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeSellMarket
+  /trade/cancel:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeCancel — tradeCancel — Cancel Order
+      description: Cancel an existing order.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeCancelRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    id: '357044'
+                    price: 50000
+                    type: limit
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeCancel
+  /orders:
+    get:
+      tags:
+        - Gunbot
+      summary: orders — orders — Get Order History for a Pair
+      description: Retrieve locally stored order history for a trading pair. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded exchange/pair key (e.g., `binance%2FUSDT-XRP`).
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+      responses:
+        '200':
+          description: Order history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: orders
+  /orders/day:
+    get:
+      tags:
+        - Gunbot
+      summary: ordersDay — ordersDay — Get Orders for Current Day (Multiple Pairs)
+      description: Retrieve orders from the current day for multiple trading pairs. Individual keys in `keys[]` array must be URL-encoded if they contain special characters.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: timezone
+          in: query
+          required: true
+          description: IANA timezone (e.g., `America/New_York`).
+          schema:
+            type: string
+          example: America/New_York
+        - name: keys[]
+          in: query
+          required: true
+          description: Array of exchange/pair keys. Each key should be URL-encoded if needed.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          example:
+            - binance/USDT-XRP
+            - mex_gunthy/USDT-DOGE
+      responses:
+        '200':
+          description: Daily orders retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersDayResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: ordersDay
+  /orders/page:
+    get:
+      tags:
+        - Gunbot
+      summary: ordersPage — ordersPage — Get Paginated Orders for a Pair
+      description: Retrieve paginated orders for a trading pair. The `key` parameter must be URL-encoded.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: URL-encoded exchange/pair key.
+          schema:
+            type: string
+          example: binance%2FUSDT-XRP
+        - name: page
+          in: query
+          required: true
+          description: Page number (0-indexed).
+          schema:
+            type: integer
+            minimum: 0
+          example: 0
+        - name: pageSize
+          in: query
+          required: true
+          description: Records per page.
+          schema:
+            type: integer
+            minimum: 1
+          example: 10
+      responses:
+        '200':
+          description: Paginated orders retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersPageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: ordersPage
+  /orders/page/multi:
+    get:
+      tags:
+        - Gunbot
+      summary: ordersPageMulti — ordersPageMulti — Get Paginated Orders (Multiple Pairs)
+      description: Retrieve paginated orders for multiple trading pairs. Individual keys in `keys[]` array must be URL-encoded if needed.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: keys[]
+          in: query
+          required: true
+          description: Array of exchange/pair keys. Each key should be URL-encoded if needed.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          example:
+            - binance/USDT-XRP
+            - mex_gunthy/USDT-DOGE
+        - name: page
+          in: query
+          required: true
+          description: Page number (0-indexed).
+          schema:
+            type: integer
+            minimum: 0
+          example: 0
+        - name: pageSize
+          in: query
+          required: true
+          description: Records per page.
+          schema:
+            type: integer
+            minimum: 1
+          example: 10
+      responses:
+        '200':
+          description: Paginated multi-pair orders retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersPageMultiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: ordersPageMulti
+  /trade/buy/stoplimit:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeBuyStoplimit — tradeBuyStoplimit — Place Stop-Limit Buy Order (Binance)
+      description: Place a stop-limit buy order on Binance.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeStopLimitRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    stopPrice: 49900
+                    limitPrice: 49850
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeBuyStoplimit
+  /trade/sell/stoplimit:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeSellStoplimit — tradeSellStoplimit — Place Stop-Limit Sell Order (Binance)
+      description: Place a stop-limit sell order on Binance.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeStopLimitRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    stopPrice: 50100
+                    limitPrice: 50150
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeSellStoplimit
+  /trade/buy/trailingstop:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeBuyTrailingstop — tradeBuyTrailingstop — Place Trailing Stop Buy Order (Binance)
+      description: Place a trailing stop buy order on Binance. `price` is the reference price.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeTrailingStopRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 50000
+                    stopPrice: 49900
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeBuyTrailingstop
+  /trade/sell/trailingstop:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeSellTrailingstop — tradeSellTrailingstop — Place Trailing Stop Sell Order (Binance)
+      description: Place a trailing stop sell order on Binance. `price` is the reference price.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeTrailingStopRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 52500
+                    stopPrice: 52550
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeSellTrailingstop
+  /trade/buy/oco:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeBuyOco — tradeBuyOco — Place OCO Buy Order (Binance)
+      description: Place an OCO (One-Cancels-the-Other) buy order on Binance.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeOcoRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 50000
+                    stopPrice: 49900
+                    limit: 49850
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeBuyOco
+  /trade/sell/oco:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeSellOco — tradeSellOco — Place OCO Sell Order (Binance)
+      description: Place an OCO (One-Cancels-the-Other) sell order on Binance.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeOcoRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: binance
+                    pair: USDT-BTC
+                    amt: 1
+                    price: 52500
+                    stopPrice: 52550
+                    limit: 52600
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeSellOco
+  /trade/close:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeClose — tradeClose — Close Position with Limit Price (Bybit Futures)
+      description: Close an open position at a specified limit price on Bybit (futures).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeCloseLimitRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: bybit
+                    pair: USDT-BTC-LONG
+                    amt: 1
+                    price: 51000
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeClose
+  /trade/close/market:
+    post:
+      tags:
+        - Gunbot
+      summary: tradeCloseMarket — tradeCloseMarket — Close Position at Market Price (Bybit Futures)
+      description: Close an open position at the current market price on Bybit (futures).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeCloseMarketRequest'
+            examples:
+              example1:
+                value:
+                  data:
+                    exch: bybit
+                    pair: USDT-BTC-LONG
+                    amt: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/TradeSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      operationId: tradeCloseMarket
 components:
   securitySchemes:
     BearerAuth:
@@ -109,8 +1741,7 @@ components:
       properties:
         password:
           type: string
-          description: The user's encrypted password. See encryption helpers in the
-            original documentation.
+          description: The user's encrypted password. See encryption helpers in the original documentation.
           example: ENC:your_encrypted_password_base64
     LoginResponse:
       type: object
@@ -157,15 +1788,15 @@ components:
         Available Qty:
           type: string
           description: Available quantity, as a string.
-          example: "442.84477668"
+          example: '442.84477668'
         On Order:
           type: string
           description: Quantity on order, as a string.
-          example: "0.00000000"
+          example: '0.00000000'
     BalancesResponse:
       type: array
       items:
-        $ref: "#/components/schemas/BalanceItem"
+        $ref: '#/components/schemas/BalanceItem'
     AssetsTotalRequest:
       type: object
       required:
@@ -213,7 +1844,7 @@ components:
     AssetsTotalResponse:
       type: array
       items:
-        $ref: "#/components/schemas/AssetTotalItem"
+        $ref: '#/components/schemas/AssetTotalItem'
     PairsResponse:
       type: object
       properties:
@@ -241,15 +1872,15 @@ components:
         low:
           type: string
           description: Lowest price, as a string.
-          example: "0.0371999999"
+          example: '0.0371999999'
         high:
           type: string
           description: Highest price, as a string.
-          example: "0.0387800000"
+          example: '0.0387800000'
         change:
           type: string
           description: Price change percentage, as a string.
-          example: "2.05"
+          example: '2.05'
     PairsDetailedResponse:
       type: object
       properties:
@@ -258,28 +1889,26 @@ components:
           example: success
         pairList:
           type: object
-          description: An object where keys are base currencies (e.g., "BTC") and values
-            are arrays of pair details.
+          description: An object where keys are base currencies (e.g., "BTC") and values are arrays of pair details.
           additionalProperties:
             type: array
             items:
-              $ref: "#/components/schemas/PairDetailItem"
+              $ref: '#/components/schemas/PairDetailItem'
           example:
             BTC:
               - pairName: BTC-ETH
                 volume: 2448.96
-                low: "0.0371999999"
-                high: "0.0387800000"
-                change: "2.05"
+                low: '0.0371999999'
+                high: '0.0387800000'
+                change: '2.05'
               - pairName: BTC-LTC
                 volume: 204.38
-                low: "0.0012870000"
-                high: "0.0014160000"
-                change: "-2.53"
+                low: '0.0012870000'
+                high: '0.0014160000'
+                change: '-2.53'
     GunbotConfig:
       type: object
-      description: Represents the Gunbot configuration structure. This is a simplified
-        placeholder; the actual config is deeply nested.
+      description: Represents the Gunbot configuration structure. This is a simplified placeholder; the actual config is deeply nested.
       properties:
         pairs:
           type: object
@@ -294,6 +1923,7 @@ components:
                   type: boolean
                 override:
                   type: object
+      additionalProperties: true
       example:
         pairs:
           binance:
@@ -309,14 +1939,14 @@ components:
           type: string
           example: success
         config:
-          $ref: "#/components/schemas/GunbotConfig"
+          $ref: '#/components/schemas/GunbotConfig'
     ConfigUpdateRequest:
       type: object
       required:
         - data
       properties:
-        data:
-          $ref: "#/components/schemas/GunbotConfig"
+        config:
+          $ref: '#/components/schemas/GunbotConfig'
           description: The new configuration object to apply.
     ConfigUpdateResponse:
       type: object
@@ -325,7 +1955,7 @@ components:
           type: string
           example: success
         config:
-          $ref: "#/components/schemas/GunbotConfig"
+          $ref: '#/components/schemas/GunbotConfig'
           description: Your updated configuration data.
     ConfigPairAddRequest:
       type: object
@@ -364,6 +1994,7 @@ components:
       type: object
       required:
         - name
+        - settings
       properties:
         name:
           type: string
@@ -492,7 +2123,7 @@ components:
       type: object
       properties:
         data:
-          $ref: "#/components/schemas/OHLCVData"
+          $ref: '#/components/schemas/OHLCVData'
     OrderbookLevel:
       type: array
       items:
@@ -506,16 +2137,16 @@ components:
         ask:
           type: array
           items:
-            $ref: "#/components/schemas/OrderbookLevel"
+            $ref: '#/components/schemas/OrderbookLevel'
         bid:
           type: array
           items:
-            $ref: "#/components/schemas/OrderbookLevel"
+            $ref: '#/components/schemas/OrderbookLevel'
     MarketOrderbookResponse:
       type: object
       properties:
         data:
-          $ref: "#/components/schemas/MarketOrderbookData"
+          $ref: '#/components/schemas/MarketOrderbookData'
     CoreMemRawRequest:
       type: object
       required:
@@ -586,7 +2217,7 @@ components:
           example: USDT-PEPE
         id:
           type: string
-          example: "3313"
+          example: '3313'
         time:
           type: integer
           format: int64
@@ -602,15 +2233,15 @@ components:
           items:
             type: string
           example:
-            - ""
+            - ''
             - 🟩 1733391279657 convert
             - Buy 9083536.00028041 PEPE
-            - "@ 0.00002162 USDT"
-            - "Total: 196.386 USDT"
+            - '@ 0.00002162 USDT'
+            - 'Total: 196.386 USDT'
     ChartMarksResponse:
       type: array
       items:
-        $ref: "#/components/schemas/ChartMarkItem"
+        $ref: '#/components/schemas/ChartMarkItem'
     PnlOverviewRequest:
       type: object
       required:
@@ -625,8 +2256,7 @@ components:
           type: array
           items:
             type: string
-          description: Array of trading keys (e.g., `['binance/USDT-BTC',
-            'binance/USDT-XRP']`). Use `['All']` for all results.
+          description: Array of trading keys (e.g., `['binance/USDT-BTC', 'binance/USDT-XRP']`). Use `['All']` for all results.
           example:
             - All
         dateRange:
@@ -646,8 +2276,7 @@ components:
     PnlOverviewResponse:
       type: object
       additionalProperties: true
-      description: A complex object containing PNL summaries. See documentation for
-        full structure.
+      description: A complex object containing PNL summaries. See documentation for full structure.
       example:
         today:
           pnl: 0
@@ -673,12 +2302,14 @@ components:
       properties:
         totalSize:
           type: integer
-          example: 0
         data:
           type: array
           items:
-            type: object
-            additionalProperties: true
+            type: array
+            items: {}
+      required:
+        - totalSize
+        - data
     PnlSumResponse:
       type: object
       properties:
@@ -687,10 +2318,10 @@ components:
           properties:
             sommaPnl:
               type: string
-              example: "0.00000000"
+              example: '0.00000000'
             invested:
               type: string
-              example: "0.00000000"
+              example: '0.00000000'
         data:
           type: array
           items:
@@ -698,9 +2329,9 @@ components:
             additionalProperties: true
     PnlTotalResponse:
       type: object
-      additionalProperties: false
+      additionalProperties: true
     SystemActionResponse:
-      $ref: "#/components/schemas/GunbotConfig"
+      $ref: '#/components/schemas/GunbotConfig'
     TimeResponse:
       type: object
       properties:
@@ -722,14 +2353,12 @@ components:
         newLicenses:
           type: object
           additionalProperties: true
-          description: Object containing new license data. Use the entire config.exchanges
-            object. For new keys, set isEncrypted to false.
+          description: Object containing new license data. Use the entire config.exchanges object. For new keys, set isEncrypted to false.
           example: {}
         verifyExchange:
           type: string
           example: binance
-          description: Name of an exchange with valid, registered credentials to
-            authenticate the request.
+          description: Name of an exchange with valid, registered credentials to authenticate the request.
     TradeLimitOrderData:
       type: object
       required:
@@ -758,7 +2387,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeLimitOrderData"
+          $ref: '#/components/schemas/TradeLimitOrderData'
     TradeMarketOrderData:
       type: object
       required:
@@ -787,7 +2416,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeMarketOrderData"
+          $ref: '#/components/schemas/TradeMarketOrderData'
     TradeResponse:
       type: object
       properties:
@@ -814,7 +2443,7 @@ components:
           example: USDT-BTC
         id:
           type: string
-          example: "357044"
+          example: '357044'
         price:
           type: number
           format: double
@@ -831,7 +2460,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeCancelData"
+          $ref: '#/components/schemas/TradeCancelData'
     OrderItem:
       type: object
       properties:
@@ -907,29 +2536,34 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/OrderItem"
+            $ref: '#/components/schemas/OrderItem'
     OrdersDayResponse:
       type: object
       properties:
         days:
           type: array
+          description: ISO-8601 dates.
           items:
-            type: object
-            additionalProperties: true
+            type: string
         orders:
           type: array
+          description: Order count per day.
           items:
-            type: object
-            additionalProperties: true
+            type: integer
         closeOrders:
           type: array
+          description: Close order count per day.
           items:
-            type: object
-            additionalProperties: true
+            type: integer
       example:
-        days: []
-        orders: []
-        closeOrders: []
+        days:
+          - '2025-06-20'
+        orders:
+          - 123456
+          - 123457
+        closeOrders:
+          - 123450
+          - 123451
     OrdersPageResponse:
       type: object
       properties:
@@ -998,7 +2632,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeStopLimitData"
+          $ref: '#/components/schemas/TradeStopLimitData'
     TradeTrailingStopData:
       type: object
       required:
@@ -1032,7 +2666,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeTrailingStopData"
+          $ref: '#/components/schemas/TradeTrailingStopData'
     TradeOcoData:
       type: object
       required:
@@ -1064,15 +2698,14 @@ components:
         limit:
           type: number
           format: double
-          description: Limit price used after stopPrice is triggered for the stop-limit
-            part.
+          description: Limit price used after stopPrice is triggered for the stop-limit part.
     TradeOcoRequest:
       type: object
       required:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeOcoData"
+          $ref: '#/components/schemas/TradeOcoData'
     TradeCloseLimitData:
       type: object
       required:
@@ -1102,7 +2735,7 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeCloseLimitData"
+          $ref: '#/components/schemas/TradeCloseLimitData'
     TradeCloseMarketData:
       type: object
       required:
@@ -1126,24 +2759,23 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/TradeCloseMarketData"
+          $ref: '#/components/schemas/TradeCloseMarketData'
   responses:
     BadRequest:
       description: Bad Request - The request was invalid or cannot be processed.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             status: error
             message: Invalid input
     Unauthorized:
-      description: Unauthorized - Authentication failed, or the user lacks necessary
-        permissions.
+      description: Unauthorized - Authentication failed, or the user lacks necessary permissions.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             status: error
             message: Authentication required
@@ -1153,7 +2785,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             status: error
             message: An internal error occurred
@@ -1162,1676 +2794,4 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/TradeResponse"
-paths:
-  /auth/login:
-    post:
-      tags:
-        - Gunbot
-      summary: Login User
-      description: Authenticate a user and obtain a JSON Web Token (JWT).
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoginRequest"
-      responses:
-        "200":
-          description: Successful authentication
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: auth_login
-  /auth/status:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Authentication Status
-      description: Validate the current session's authentication status using the
-        provided token.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Authentication status retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthStatusResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: auth_status
-  /balances:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Asset Balances
-      description: Retrieve asset balances across exchanges for the authenticated user.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Balances retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BalancesResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: balances
-  /assets/total:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Historical Total Asset Value
-      description: Retrieve historical total asset value in a base currency over a
-        time range.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AssetsTotalRequest"
-      responses:
-        "200":
-          description: Historical asset values retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AssetsTotalResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: assets_total
-  /pairs:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Trading Pairs
-      description: Retrieve a list of trading pairs for a specified exchange. The
-        `exchange` parameter should be URL-encoded if it contains special
-        characters (e.g., `#` as `%23`).
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: exchange
-          in: query
-          required: true
-          description: Exchange name (e.g., `binance%233`).
-          schema:
-            type: string
-          example: binance%233
-      responses:
-        "200":
-          description: Trading pairs retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PairsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pairs
-  /pairs/detailed:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Detailed Trading Pairs
-      description: Retrieve detailed trading pair information for a specified
-        exchange. The `exchange` parameter should be URL-encoded if it contains
-        special characters.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: exchange
-          in: query
-          required: true
-          description: Exchange name (e.g., `binance%233`).
-          schema:
-            type: string
-          example: binance%233
-      responses:
-        "200":
-          description: Detailed trading pair information retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PairsDetailedResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pairs_detailed
-  /config/full:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Full Configuration
-      description: Retrieve the entire application configuration.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Full configuration retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConfigFullResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_full
-  /config/update:
-    post:
-      tags:
-        - Gunbot
-      summary: Update Full Configuration
-      description: Update the entire configuration with a new object.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConfigUpdateRequest"
-      responses:
-        "200":
-          description: Configuration updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConfigUpdateResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_update
-  /config/pair/add:
-    post:
-      tags:
-        - Gunbot
-      summary: Add Trading Pair to Configuration
-      description: Add a new trading pair to the configuration.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConfigPairAddRequest"
-      responses:
-        "200":
-          description: Trading pair added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_pair_add
-  /config/pair/remove:
-    post:
-      tags:
-        - Gunbot
-      summary: Remove Trading Pair from Configuration
-      description: Remove a trading pair from the configuration.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConfigPairRemoveRequest"
-      responses:
-        "200":
-          description: Trading pair removed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_pair_remove
-  /config/strategy/add:
-    post:
-      tags:
-        - Gunbot
-      summary: Add Trading Strategy to Configuration
-      description: Add a new trading strategy to the configuration.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConfigStrategyAddRequest"
-      responses:
-        "200":
-          description: Trading strategy added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_strategy_add
-  /config/strategy/remove:
-    post:
-      tags:
-        - Gunbot
-      summary: Remove Trading Strategy from Configuration
-      description: Remove a trading strategy from the configuration.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConfigStrategyRemoveRequest"
-      responses:
-        "200":
-          description: Trading strategy removed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: config_strategy_remove
-  /files/acvar:
-    get:
-      tags:
-        - Gunbot
-      summary: List AutoConfig Variable Files
-      description: List filenames of available AutoConfig variable files.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: AutoConfig variable files listed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_acvar
-  /files/acvar/get:
-    post:
-      tags:
-        - Gunbot
-      summary: Get AutoConfig Variable File Content
-      description: Retrieve the content of a specified AutoConfig variable file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileGetRequest"
-      responses:
-        "200":
-          description: AutoConfig variable file content retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileAclarContentResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_acvar_get
-  /files/autoconfig/write:
-    post:
-      tags:
-        - Gunbot
-      summary: Write to autoconfig.json File
-      description: Write content to the `autoconfig.json` file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileWriteRequest"
-      responses:
-        "200":
-          description: Content written to autoconfig.json
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_autoconfig_write
-  /files/backup:
-    post:
-      tags:
-        - Gunbot
-      summary: List Backup Files
-      description: List available backup files.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Backup files listed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_backup
-  /files/backup/get:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Backup File Content
-      description: Retrieve the content of a specified backup config file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileGetRequest"
-      responses:
-        "200":
-          description: Backup file content retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileContentResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_backup_get
-  /files/custom-editor/get:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Custom Strategy Editor File Content
-      description: Retrieve the content of the custom strategy editor file.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Custom strategy editor file content retrieved
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: true
-                example: {}
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_custom_editor_get
-  /files/custom-editor/write:
-    post:
-      tags:
-        - Gunbot
-      summary: Write to Custom Strategy Editor File
-      description: Write content to the custom strategy editor file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileWriteRequest"
-      responses:
-        "200":
-          description: Content written to custom strategy editor file
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_custom_editor_write
-  /files/state:
-    get:
-      tags:
-        - Gunbot
-      summary: List State Files
-      description: List filenames of available state files.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: State files listed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_state
-  /files/state/get:
-    post:
-      tags:
-        - Gunbot
-      summary: Get State File Content
-      description: Retrieve the content of a specific state file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileGetRequest"
-      responses:
-        "200":
-          description: State file content retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileStateContentResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_state_get
-  /files/strategy:
-    get:
-      tags:
-        - Gunbot
-      summary: List Custom Strategy Files
-      description: List filenames of available custom strategy files (JavaScript files).
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Custom strategy files listed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FileListResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_strategy
-  /files/strategy/get:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Custom Strategy File Content
-      description: Retrieve the content of a specific custom strategy file. The
-        response is the raw content of the file, likely JavaScript code, wrapped
-        in a JSON object.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileGetRequest"
-      responses:
-        "200":
-          description: Custom strategy file content retrieved. Example shows an empty
-            object, actual content would be the file's text if it were wrapped.
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: true
-                example: {}
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_strategy_get
-  /files/strategy/write:
-    post:
-      tags:
-        - Gunbot
-      summary: Write to Custom Strategy File
-      description: Write JavaScript code content to a specific custom strategy file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileStrategyWriteRequest"
-      responses:
-        "200":
-          description: Content written to custom strategy file
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_strategy_write
-  /files/strategy/delete:
-    post:
-      tags:
-        - Gunbot
-      summary: Delete Custom Strategy File
-      description: Delete a specific custom strategy file.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FileGetRequest"
-      responses:
-        "200":
-          description: Custom strategy file deleted
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: files_strategy_delete
-  /market/candles:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Market Candles (OHLCV)
-      description: Retrieve historical OHLCV candle data for a trading pair. The `key`
-        parameter (exchange/pair) must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded trading pair key (e.g., `binance%2FUSDT-PEPE`).
-          schema:
-            type: string
-          example: binance%2FUSDT-PEPE
-      responses:
-        "200":
-          description: Candle data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MarketCandlesResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: market_candles
-  /market/orderbook:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Market Orderbook
-      description: Retrieve current order book (bids and asks) for a trading pair. The
-        `key` parameter must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded trading pair key (e.g., `binance%2FUSDT-PEPE`).
-          schema:
-            type: string
-          example: binance%2FUSDT-PEPE
-      responses:
-        "200":
-          description: Order book data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MarketOrderbookResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: market_orderbook
-  /coremem/raw:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Raw Core Memory Data for a Pair
-      description: Retrieve raw core memory data for a specific trading pair,
-        optionally filtered by elements.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CoreMemRawRequest"
-      responses:
-        "200":
-          description: Raw core memory data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CoreMemRawResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: coremem_request
-  /coremem:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Core Memory Snapshot (All Pairs)
-      description: Retrieve a snapshot of relevant core memory data for all active
-        trading pairs. Data is slightly delayed and transformed for frontend
-        use.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Core memory snapshot retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CoreMemSnapshotResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: coremem
-  /coremem/single:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Core Memory Snapshot (Single Pair)
-      description: Retrieve a snapshot of relevant core memory data for a single
-        active trading pair. Data is slightly delayed and transformed.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CoreMemSingleRequest"
-      responses:
-        "200":
-          description: Single pair core memory snapshot retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CoreMemSnapshotResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: coremem_single
-  /chart/data:
-    post:
-      tags:
-        - Gunbot
-      summary: Get Chart Data (Candles and Indicators)
-      description: Retrieve chart data, including candles and indicators, for a
-        specific trading pair.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ChartDataRequest"
-      responses:
-        "200":
-          description: Chart data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ChartDataResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: chart_data
-  /chart/marks:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Chart Timescale Marks
-      description: Retrieve chart timescale marks (annotations like buy/sell triggers)
-        for a pair and interval.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: exchange
-          in: query
-          required: true
-          schema:
-            type: string
-          example: binance
-        - name: pair
-          in: query
-          required: true
-          schema:
-            type: string
-          example: USDT-XRP
-        - name: interval
-          in: query
-          required: true
-          description: Time interval in minutes.
-          schema:
-            type: string
-          example: "15"
-        - name: startTime
-          in: query
-          required: true
-          description: Start time (UNIX timestamp seconds).
-          schema:
-            type: string
-          example: "0"
-        - name: endTime
-          in: query
-          required: true
-          description: End time (UNIX timestamp seconds).
-          schema:
-            type: string
-          example: "2114377200"
-      responses:
-        "200":
-          description: Chart marks retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ChartMarksResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: chart_marks
-  /pnl/overview:
-    post:
-      tags:
-        - Gunbot
-      summary: Get PNL Overview
-      description: Retrieve an overview of PNL data, summarized over time periods and
-        trading pairs.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PnlOverviewRequest"
-      responses:
-        "200":
-          description: PNL overview retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PnlOverviewResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pnl_overview
-  /pnl/daily:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Daily PNL for a Trading Key
-      description: Retrieve daily PNL data for a specific trading key within a time
-        range. The `key` parameter must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded trading key (e.g. `binance%2FUSDT-XRP`).
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-        - name: startTimestamp
-          in: query
-          required: true
-          description: Start timestamp (ms).
-          schema:
-            type: integer
-            format: int64
-          example: 0
-        - name: endTimestamp
-          in: query
-          required: true
-          description: End timestamp (ms).
-          schema:
-            type: integer
-            format: int64
-          example: 1733307452623
-      responses:
-        "200":
-          description: Daily PNL data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PnlDailyResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pnl_daily
-  /pnl/daily/paginated:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Paginated Daily PNL for a Trading Key
-      description: Retrieve paginated daily PNL data for a specific trading key. The
-        `key` parameter must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded trading key.
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-        - name: pageNum
-          in: query
-          required: true
-          description: Page number.
-          schema:
-            type: integer
-          example: 1
-        - name: pageSize
-          in: query
-          required: true
-          description: Records per page.
-          schema:
-            type: integer
-          example: 10
-        - name: endTime
-          in: query
-          required: true
-          description: End timestamp (ms).
-          schema:
-            type: integer
-            format: int64
-          example: 1733307452649
-      responses:
-        "200":
-          description: Paginated daily PNL data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PnlDailyPaginatedResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pnl_daily_paginated
-  /pnl/sum:
-    get:
-      tags:
-        - Gunbot
-      summary: Get PNL Sum for an Exchange Key
-      description: Retrieve total PNL sum and investment for an exchange key over a
-        time range. The `exchange` parameter (exchange key) must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: exchange
-          in: query
-          required: true
-          description: URL-encoded exchange key (e.g. `binance%2FUSDT-XRP`).
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-        - name: startTimestamp
-          in: query
-          required: true
-          description: Start timestamp (ms).
-          schema:
-            type: integer
-            format: int64
-          example: 0
-        - name: endTimestamp
-          in: query
-          required: true
-          description: End timestamp (ms).
-          schema:
-            type: integer
-            format: int64
-          example: 1733307452649
-      responses:
-        "200":
-          description: PNL sum retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PnlSumResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pnl_sum
-  /pnl/total:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Total PNL for a Trading Key
-      description: Retrieve total PNL for a specific trading key. The `key` parameter
-        must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded trading key.
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-      responses:
-        "200":
-          description: Total PNL retrieved (example shows empty object)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PnlTotalResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: pnl_total
-  /system/start:
-    post:
-      tags:
-        - Gunbot
-      summary: Start System
-      description: Start the Gunbot system. Returns current configuration without
-        private keys.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: System started
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SystemActionResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-      operationId: system_start
-  /system/stop:
-    post:
-      tags:
-        - Gunbot
-      summary: Stop System
-      description: Stop the Gunbot system. Returns current configuration without
-        private keys.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: System stopped
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SystemActionResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-      operationId: system_stop
-  /time:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Server Time
-      description: Retrieve the current server time in milliseconds since Unix epoch.
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Server time retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TimeResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: time
-  /license/keys/edit:
-    post:
-      tags:
-        - Gunbot
-      summary: Edit License Keys
-      description: Edit license keys for a wallet, optionally verifying with an exchange.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LicenseKeysEditRequest"
-      responses:
-        "200":
-          description: License keys edited
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessStatusResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-      operationId: license_keys_edit
-  /trade/buy:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Limit Buy Order
-      description: Place a limit buy order.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeLimitOrderRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 50000
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_buy
-  /trade/buy/market:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Market Buy Order
-      description: Place a market buy order.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeMarketOrderRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_buy_market
-  /trade/sell:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Limit Sell Order
-      description: Place a limit sell order.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeLimitOrderRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 52500
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_sell
-  /trade/sell/market:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Market Sell Order
-      description: Place a market sell order.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeMarketOrderRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_sell_market
-  /trade/cancel:
-    post:
-      tags:
-        - Gunbot
-      summary: Cancel Order
-      description: Cancel an existing order.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeCancelRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    id: "357044"
-                    price: 50000
-                    type: limit
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_cancel
-  /orders:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Order History for a Pair
-      description: Retrieve locally stored order history for a trading pair. The `key`
-        parameter must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded exchange/pair key (e.g., `binance%2FUSDT-XRP`).
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-      responses:
-        "200":
-          description: Order history retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OrdersResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: orders
-  /orders/day:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Orders for Current Day (Multiple Pairs)
-      description: Retrieve orders from the current day for multiple trading pairs.
-        Individual keys in `keys[]` array must be URL-encoded if they contain
-        special characters.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: timezone
-          in: query
-          required: true
-          description: IANA timezone (e.g., `America/New_York`).
-          schema:
-            type: string
-          example: America/New_York
-        - name: keys[]
-          in: query
-          required: true
-          description: Array of exchange/pair keys. Each key should be URL-encoded if
-            needed.
-          schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: true
-          example:
-            - binance/USDT-XRP
-            - mex_gunthy/USDT-DOGE
-      responses:
-        "200":
-          description: Daily orders retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OrdersDayResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: orders_day
-  /orders/page:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Paginated Orders for a Pair
-      description: Retrieve paginated orders for a trading pair. The `key` parameter
-        must be URL-encoded.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: URL-encoded exchange/pair key.
-          schema:
-            type: string
-          example: binance%2FUSDT-XRP
-        - name: page
-          in: query
-          required: true
-          description: Page number (0-indexed).
-          schema:
-            type: integer
-            minimum: 0
-          example: 0
-        - name: pageSize
-          in: query
-          required: true
-          description: Records per page.
-          schema:
-            type: integer
-            minimum: 1
-          example: 10
-      responses:
-        "200":
-          description: Paginated orders retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OrdersPageResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: orders_page
-  /orders/page/multi:
-    get:
-      tags:
-        - Gunbot
-      summary: Get Paginated Orders (Multiple Pairs)
-      description: Retrieve paginated orders for multiple trading pairs. Individual
-        keys in `keys[]` array must be URL-encoded if needed.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: keys[]
-          in: query
-          required: true
-          description: Array of exchange/pair keys. Each key should be URL-encoded if
-            needed.
-          schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: true
-          example:
-            - binance/USDT-XRP
-            - mex_gunthy/USDT-DOGE
-        - name: page
-          in: query
-          required: true
-          description: Page number (0-indexed).
-          schema:
-            type: integer
-            minimum: 0
-          example: 0
-        - name: pageSize
-          in: query
-          required: true
-          description: Records per page.
-          schema:
-            type: integer
-            minimum: 1
-          example: 10
-      responses:
-        "200":
-          description: Paginated multi-pair orders retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OrdersPageMultiResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: orders_page_multi
-  /trade/buy/stoplimit:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Stop-Limit Buy Order (Binance)
-      description: Place a stop-limit buy order on Binance.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeStopLimitRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    stopPrice: 49900
-                    limitPrice: 49850
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_buy_stoplimit
-  /trade/sell/stoplimit:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Stop-Limit Sell Order (Binance)
-      description: Place a stop-limit sell order on Binance.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeStopLimitRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    stopPrice: 50100
-                    limitPrice: 50150
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_sell_stoplimit
-  /trade/buy/trailingstop:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Trailing Stop Buy Order (Binance)
-      description: Place a trailing stop buy order on Binance. `price` is the
-        reference price.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeTrailingStopRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 50000
-                    stopPrice: 49900
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_buy_trailingstop
-  /trade/sell/trailingstop:
-    post:
-      tags:
-        - Gunbot
-      summary: Place Trailing Stop Sell Order (Binance)
-      description: Place a trailing stop sell order on Binance. `price` is the
-        reference price.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeTrailingStopRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 52500
-                    stopPrice: 52550
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_sell_trailingstop
-  /trade/buy/oco:
-    post:
-      tags:
-        - Gunbot
-      summary: Place OCO Buy Order (Binance)
-      description: Place an OCO (One-Cancels-the-Other) buy order on Binance.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeOcoRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 50000
-                    stopPrice: 49900
-                    limit: 49850
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_buy_oco
-  /trade/sell/oco:
-    post:
-      tags:
-        - Gunbot
-      summary: Place OCO Sell Order (Binance)
-      description: Place an OCO (One-Cancels-the-Other) sell order on Binance.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeOcoRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: binance
-                    pair: USDT-BTC
-                    amt: 1
-                    price: 52500
-                    stopPrice: 52550
-                    limit: 52600
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_sell_oco
-  /trade/close:
-    post:
-      tags:
-        - Gunbot
-      summary: Close Position with Limit Price (Bybit Futures)
-      description: Close an open position at a specified limit price on Bybit (futures).
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeCloseLimitRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: bybit
-                    pair: USDT-BTC-LONG
-                    amt: 1
-                    price: 51000
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_close
-  /trade/close/market:
-    post:
-      tags:
-        - Gunbot
-      summary: Close Position at Market Price (Bybit Futures)
-      description: Close an open position at the current market price on Bybit (futures).
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TradeCloseMarketRequest"
-            examples:
-              example1:
-                value:
-                  data:
-                    exch: bybit
-                    pair: USDT-BTC-LONG
-                    amt: 1
-      responses:
-        "200":
-          $ref: "#/components/responses/TradeSuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      operationId: trade_close_market
-tags:
-  - name: Gunbot
-    description: All Gunbot endpoints
+            $ref: '#/components/schemas/TradeResponse'
